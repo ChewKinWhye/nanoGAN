@@ -12,14 +12,9 @@ def preprocess(x):
 def load_data(args):
     ###Dataset: mnist, cifar10, kdd99, custom
     ###Ano_class: 1 actual class label of the dataset
-    if args.dataset == 'mnist':
-        return get_mnist(args.ano_class)
-    elif args.dataset == 'cifar10':
-        return get_cifar10(args.ano_class)
-    elif args.dataset == "ecoli":
-        return get_ecoli(args.ano_class)
+    return get_ecoli()
 
-def get_ecoli(ano_class):
+def get_ecoli():
     train_size = 100000
     test_size = 20000
     modification_ratio = 0.1
