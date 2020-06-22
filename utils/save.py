@@ -17,14 +17,16 @@ def save_model(args, D):
     D.save(f'{result_path}/discriminator.h5')
 
 
-def save_results(args, results):
+def save_results(args, results, y_test):
     create_directories(args)
     result_path = f'./results/{args.output_filename}/'
 
-    result_json = ["best_au_prc", round(results[0], 3)]
+    result_json = {
+        "best_au_prc": round(results[0], 3),
+        "best_au_roc": round(results[3], 3)}
 
     with open(f'{result_path}/result.json', 'w+') as outfile:
         json.dump(result_json, outfile, indent=4)
 
-    plt = plot_prc(results[1], results[2])
+    plt = plot_prc(results, y_test)
     plt.savefig(f"{result_path}/prc.png")

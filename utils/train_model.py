@@ -43,9 +43,9 @@ def train(args, generator, discriminator, GAN, x_train, x_test, y_test, x_val, y
     batch_size = args.batch_size
     v_freq = args.v_freq
     latent_dim = args.latent_dim
-    d_loss = []
-    g_loss = []
-    best_au_prc_val, best_recall_val, best_precision_val = 0, 0, 0
+
+    d_loss, g_loss = [], []
+    best_au_roc_val, best_au_prc, best_recall, best_precision, best_au_roc, best_fpr, best_tpr = 0, 0, 0, 0, 0, 0, 0
 
     print('===== Start of Adversarial Training =====')
     for epoch in range(epochs):
@@ -80,18 +80,25 @@ def train(args, generator, discriminator, GAN, x_train, x_test, y_test, x_val, y
             break    
         
         if (epoch + 1) % v_freq == 0:
-            au_prc_val, precision_val, recall_val, _, _, _ = compute_metrics(discriminator, x_val, y_val)
+            # Check for the best validation results
+            y_predicted = 1 - np.squeeze(discriminator.predict(x_val))
+            _, _, _, au_roc_val, _, _ = compute_metrics(y_predicted, y_val)
 
-            if au_prc_val > best_au_prc_val:
-                best_au_prc_val, best_precision_val, best_recall_val = au_prc_val, precision_val, recall_val
+            if au_roc_val > best_au_roc_val:
+                best_au_roc_val = au_roc_val
+                # Save the best test results
+                y_predicted = 1 - np.squeeze(discriminator.predict(x_test))
+                best_au_prc, best_recall, best_precision, best_au_roc, best_fpr, best_tpr \
+                    = compute_metrics(y_predicted, y_test)
                 save_model(args, discriminator)
                 
-            print(f"\tGen. Loss: {g_loss[-1]:.3f}\n\tDisc. Loss: {d_loss[-1]:.3f}\n\t: {au_prc_val:.3f}")
+            print(f"\tGen. Loss: {g_loss[-1]:.3f}\n\tDisc. Loss: {d_loss[-1]:.3f}\n\t: {au_roc_val:.3f}")
         else:
             print(f"\tGen. Loss: {g_loss[-1]:.3f}\n\tDisc. Loss: {d_loss[-1]:.3f}")
 
     print('===== End of Adversarial Training =====')
-    print(f'Best test: {round(best_au_prc_val, 3)}')
-    results = (best_au_prc_val, best_precision_val, best_recall_val)
+    print(f'Best test au_prc: {round(best_au_prc, 3)}\nBest test au_roc: {round(best_au_roc, 3)}')
+
+    results = (best_au_prc, best_recall, best_precision, best_au_roc, best_fpr, best_tpr)
 
     return results

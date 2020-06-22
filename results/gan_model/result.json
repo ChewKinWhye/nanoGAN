@@ -1,4 +1,4 @@
-[
-    "best_au_prc",
-    0.125
-]
+{
+    "best_au_prc": 0.125,
+    "best_au_roc": 0.495
+}
