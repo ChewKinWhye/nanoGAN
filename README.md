@@ -21,16 +21,9 @@ This is the official implementation of the paper: Fence GAN: Towards Better Anom
 
 ## Anomaly Detection
 Check results and plots under `result` folder
-### 2D Synthetic Dataset
-    
-    python3 2D_experiment/2D_fgan.py
-    
-### MNIST
-    python3 main.py --dataset mnist --ano_class 0 --epochs 100 --alpha 0.1 --beta 30 --gamma 0.1 --batch_size 200 --pretrain 15 --d_lr 1e-5 --g_lr 2e-5 --v_freq 4 --latent_dim 200 --evaluation 'auprc'
+### Ecoli data set
+python main.py --epochs 1 --alpha 0.1 --beta 30 --gamma 0.1 --pretrain 1 --d_lr 1e-5 --g_lr 2e-5  --latent_dim 200 --data_size 1000
 
-
-### CIFAR10
-    python3 main.py --dataset cifar10 --ano_class 0 --epochs 150 --alpha 0.5 --beta 10 --gamma 0.5 --batch_size 128 --pretrain 15 --d_lr 1e-4 --g_lr 1e-3 --v_freq 1 --latent_dim 256 --evaluation 'auroc'
 
 ### More training option
 Enter `python3 main.py -h` for more training options
@@ -62,14 +55,3 @@ Enter `python3 main.py -h` for more training options
       --latent_dim      Latent dimension of Gaussian noise input to Generator
   ```
   
-## Citation
-  ```
-  @article{ngo2019,
-      author    = {Cuong Phuc Ngo and Amadeus Aristo Winarto and Connie Khor Li Kou and
-                   Sojeong Park and Farhan Akram and Hwee Kuan Lee},
-      title     = {Fence GAN: Towards Better Anomaly Detection},
-      year      = {2019},
-      url       = {https://arxiv.org/pdf/1904.01209.pdf},
-      archivePrefix = {arXiv}
-  }
-  ```
