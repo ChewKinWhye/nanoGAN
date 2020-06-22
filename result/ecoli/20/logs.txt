@@ -1,0 +1,301 @@
+
+Epoch: 1
+	 Val_auprc: 0.129 
+	 Test_auprc: 0.129
+Epoch: 2
+	 Val_auprc: 0.124 
+	 Test_auprc: 0.124
+Epoch: 3
+	 Val_auprc: 0.120 
+	 Test_auprc: 0.120
+Epoch: 4
+	 Val_auprc: 0.128 
+	 Test_auprc: 0.128
+Epoch: 5
+	 Val_auprc: 0.129 
+	 Test_auprc: 0.129
+Epoch: 6
+	 Val_auprc: 0.131 
+	 Test_auprc: 0.131
+Epoch: 7
+	 Val_auprc: 0.146 
+	 Test_auprc: 0.146
+Epoch: 8
+	 Val_auprc: 0.155 
+	 Test_auprc: 0.155
+Epoch: 9
+	 Val_auprc: 0.155 
+	 Test_auprc: 0.155
+Epoch: 10
+	 Val_auprc: 0.162 
+	 Test_auprc: 0.162
+Epoch: 11
+	 Val_auprc: 0.153 
+	 Test_auprc: 0.153
+Epoch: 12
+	 Val_auprc: 0.156 
+	 Test_auprc: 0.156
+Epoch: 13
+	 Val_auprc: 0.151 
+	 Test_auprc: 0.151
+Epoch: 14
+	 Val_auprc: 0.158 
+	 Test_auprc: 0.158
+Epoch: 15
+	 Val_auprc: 0.163 
+	 Test_auprc: 0.163
+Epoch: 16
+	 Val_auprc: 0.166 
+	 Test_auprc: 0.166
+Epoch: 17
+	 Val_auprc: 0.169 
+	 Test_auprc: 0.169
+Epoch: 18
+	 Val_auprc: 0.170 
+	 Test_auprc: 0.170
+Epoch: 19
+	 Val_auprc: 0.166 
+	 Test_auprc: 0.166
+Epoch: 20
+	 Val_auprc: 0.175 
+	 Test_auprc: 0.175
+Epoch: 21
+	 Val_auprc: 0.175 
+	 Test_auprc: 0.175
+Epoch: 22
+	 Val_auprc: 0.171 
+	 Test_auprc: 0.171
+Epoch: 23
+	 Val_auprc: 0.166 
+	 Test_auprc: 0.166
+Epoch: 24
+	 Val_auprc: 0.167 
+	 Test_auprc: 0.167
+Epoch: 25
+	 Val_auprc: 0.167 
+	 Test_auprc: 0.167
+Epoch: 26
+	 Val_auprc: 0.168 
+	 Test_auprc: 0.168
+Epoch: 27
+	 Val_auprc: 0.172 
+	 Test_auprc: 0.172
+Epoch: 28
+	 Val_auprc: 0.166 
+	 Test_auprc: 0.166
+Epoch: 29
+	 Val_auprc: 0.153 
+	 Test_auprc: 0.153
+Epoch: 30
+	 Val_auprc: 0.173 
+	 Test_auprc: 0.173
+Epoch: 31
+	 Val_auprc: 0.150 
+	 Test_auprc: 0.150
+Epoch: 32
+	 Val_auprc: 0.165 
+	 Test_auprc: 0.165
+Epoch: 33
+	 Val_auprc: 0.170 
+	 Test_auprc: 0.170
+Epoch: 34
+	 Val_auprc: 0.169 
+	 Test_auprc: 0.169
+Epoch: 35
+	 Val_auprc: 0.167 
+	 Test_auprc: 0.167
+Epoch: 36
+	 Val_auprc: 0.169 
+	 Test_auprc: 0.169
+Epoch: 37
+	 Val_auprc: 0.165 
+	 Test_auprc: 0.165
+Epoch: 38
+	 Val_auprc: 0.161 
+	 Test_auprc: 0.161
+Epoch: 39
+	 Val_auprc: 0.166 
+	 Test_auprc: 0.166
+Epoch: 40
+	 Val_auprc: 0.162 
+	 Test_auprc: 0.162
+Epoch: 41
+	 Val_auprc: 0.156 
+	 Test_auprc: 0.156
+Epoch: 42
+	 Val_auprc: 0.154 
+	 Test_auprc: 0.154
+Epoch: 43
+	 Val_auprc: 0.153 
+	 Test_auprc: 0.153
+Epoch: 44
+	 Val_auprc: 0.153 
+	 Test_auprc: 0.153
+Epoch: 45
+	 Val_auprc: 0.151 
+	 Test_auprc: 0.151
+Epoch: 46
+	 Val_auprc: 0.153 
+	 Test_auprc: 0.153
+Epoch: 47
+	 Val_auprc: 0.151 
+	 Test_auprc: 0.151
+Epoch: 48
+	 Val_auprc: 0.148 
+	 Test_auprc: 0.148
+Epoch: 49
+	 Val_auprc: 0.153 
+	 Test_auprc: 0.153
+Epoch: 50
+	 Val_auprc: 0.152 
+	 Test_auprc: 0.152
+Epoch: 51
+	 Val_auprc: 0.149 
+	 Test_auprc: 0.149
+Epoch: 52
+	 Val_auprc: 0.150 
+	 Test_auprc: 0.150
+Epoch: 53
+	 Val_auprc: 0.152 
+	 Test_auprc: 0.152
+Epoch: 54
+	 Val_auprc: 0.152 
+	 Test_auprc: 0.152
+Epoch: 55
+	 Val_auprc: 0.149 
+	 Test_auprc: 0.149
+Epoch: 56
+	 Val_auprc: 0.151 
+	 Test_auprc: 0.151
+Epoch: 57
+	 Val_auprc: 0.151 
+	 Test_auprc: 0.151
+Epoch: 58
+	 Val_auprc: 0.151 
+	 Test_auprc: 0.151
+Epoch: 59
+	 Val_auprc: 0.151 
+	 Test_auprc: 0.151
+Epoch: 60
+	 Val_auprc: 0.151 
+	 Test_auprc: 0.151
+Epoch: 61
+	 Val_auprc: 0.149 
+	 Test_auprc: 0.149
+Epoch: 62
+	 Val_auprc: 0.151 
+	 Test_auprc: 0.151
+Epoch: 63
+	 Val_auprc: 0.151 
+	 Test_auprc: 0.151
+Epoch: 64
+	 Val_auprc: 0.150 
+	 Test_auprc: 0.150
+Epoch: 65
+	 Val_auprc: 0.149 
+	 Test_auprc: 0.149
+Epoch: 66
+	 Val_auprc: 0.150 
+	 Test_auprc: 0.150
+Epoch: 67
+	 Val_auprc: 0.151 
+	 Test_auprc: 0.151
+Epoch: 68
+	 Val_auprc: 0.150 
+	 Test_auprc: 0.150
+Epoch: 69
+	 Val_auprc: 0.148 
+	 Test_auprc: 0.148
+Epoch: 70
+	 Val_auprc: 0.150 
+	 Test_auprc: 0.150
+Epoch: 71
+	 Val_auprc: 0.148 
+	 Test_auprc: 0.148
+Epoch: 72
+	 Val_auprc: 0.149 
+	 Test_auprc: 0.149
+Epoch: 73
+	 Val_auprc: 0.148 
+	 Test_auprc: 0.148
+Epoch: 74
+	 Val_auprc: 0.147 
+	 Test_auprc: 0.147
+Epoch: 75
+	 Val_auprc: 0.147 
+	 Test_auprc: 0.147
+Epoch: 76
+	 Val_auprc: 0.147 
+	 Test_auprc: 0.147
+Epoch: 77
+	 Val_auprc: 0.148 
+	 Test_auprc: 0.148
+Epoch: 78
+	 Val_auprc: 0.149 
+	 Test_auprc: 0.149
+Epoch: 79
+	 Val_auprc: 0.147 
+	 Test_auprc: 0.147
+Epoch: 80
+	 Val_auprc: 0.146 
+	 Test_auprc: 0.146
+Epoch: 81
+	 Val_auprc: 0.146 
+	 Test_auprc: 0.146
+Epoch: 82
+	 Val_auprc: 0.148 
+	 Test_auprc: 0.148
+Epoch: 83
+	 Val_auprc: 0.148 
+	 Test_auprc: 0.148
+Epoch: 84
+	 Val_auprc: 0.148 
+	 Test_auprc: 0.148
+Epoch: 85
+	 Val_auprc: 0.148 
+	 Test_auprc: 0.148
+Epoch: 86
+	 Val_auprc: 0.148 
+	 Test_auprc: 0.148
+Epoch: 87
+	 Val_auprc: 0.147 
+	 Test_auprc: 0.147
+Epoch: 88
+	 Val_auprc: 0.149 
+	 Test_auprc: 0.149
+Epoch: 89
+	 Val_auprc: 0.150 
+	 Test_auprc: 0.150
+Epoch: 90
+	 Val_auprc: 0.151 
+	 Test_auprc: 0.151
+Epoch: 91
+	 Val_auprc: 0.151 
+	 Test_auprc: 0.151
+Epoch: 92
+	 Val_auprc: 0.149 
+	 Test_auprc: 0.149
+Epoch: 93
+	 Val_auprc: 0.149 
+	 Test_auprc: 0.149
+Epoch: 94
+	 Val_auprc: 0.145 
+	 Test_auprc: 0.145
+Epoch: 95
+	 Val_auprc: 0.145 
+	 Test_auprc: 0.145
+Epoch: 96
+	 Val_auprc: 0.145 
+	 Test_auprc: 0.145
+Epoch: 97
+	 Val_auprc: 0.143 
+	 Test_auprc: 0.143
+Epoch: 98
+	 Val_auprc: 0.144 
+	 Test_auprc: 0.144
+Epoch: 99
+	 Val_auprc: 0.145 
+	 Test_auprc: 0.145
+Epoch: 100
+	 Val_auprc: 0.145 
+	 Test_auprc: 0.145

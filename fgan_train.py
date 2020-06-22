@@ -8,6 +8,7 @@ import numpy as np
 from numpy.random import seed
 from tensorflow import set_random_seed
 import keras.backend as K
+import matplotlib.pyplot as plt
 
 from utils.model import *
 from utils.data import load_data
@@ -85,7 +86,11 @@ def train(args, G ,D, GAN, x_train, x_test, y_test, x_val, y_val):
     g_loss = []
     best_val = 0
     best_test = 0
-    
+    best_precision = []
+    best_recall = []
+    best_fpr = []
+    best_tpr = []
+    best_epoch = 0
     print('===== Start of Adversarial Training =====')
     for epoch in range(epochs):
         try:
@@ -118,25 +123,38 @@ def train(args, G ,D, GAN, x_train, x_test, y_test, x_val, y_val):
             break    
         
         if (epoch + 1) % v_freq == 0:
-            val, test = compute_au(D, G, GAN, x_val, y_val, x_test, y_test, evaluation)
-            
+            val_prc, test_prc, precision, recall, fpr, tpr, val_roc = compute_au(D, G, GAN, x_val, y_val, x_test, y_test, evaluation)
             f = open('{}/logs.txt'.format(result_path),'a+')
-            f.write('\nEpoch: {}\n\t Val_{}: {:.3f} \n\t Test_{}: {:.3f}'.format(epoch+1, evaluation, val, evaluation, test))
+            f.write('\nEpoch: {}\n\t Val_{}: {:.3f} \n\t Test_{}: {:.3f}'.format(epoch+1, evaluation, val_prc, evaluation, test_prc))
             f.close()
             
-            if val > best_val:
-                best_val = val
-                best_test = test
+            if val_roc > best_val:
+                best_val = val_roc
+                best_test = test_prc
+                best_precision = precision
+                best_recall = recall
+                best_fpr = fpr
+                best_tpr = tpr
+                best_epoch = epoch
+
                 histogram(G, D, GAN, x_test, y_test, result_path, latent_dim)
-                show_images(G.predict(noise_data(25, latent_dim)),result_path)
+                # show_images(G.predict(noise_data(25, latent_dim)),result_path)
                 
                 G.save('{}/gen_anoclass_{}.h5'.format(result_path,ano_class))
                 D.save('{}/dis_anoclass_{}.h5'.format(result_path,ano_class))
                 
-            print("\tGen. Loss: {:.3f}\n\tDisc. Loss: {:.3f}\n\t{}: {:.3f}".format(g_loss[-1], d_loss[-1], evaluation, val))
+            print("\tGen. Loss: {:.3f}\n\tDisc. Loss: {:.3f}\n\t{}: {:.3f}".format(g_loss[-1], d_loss[-1], evaluation, val_prc))
+            print(val_roc)
         else:
             print("\tGen. Loss: {:.3f}\n\tDisc. Loss: {:.3f}".format(g_loss[-1], d_loss[-1]))
-    
+
+    plt.plot(best_recall, best_precision, 'r-')
+    plt.plot(best_fpr, best_tpr, 'b-')
+    plt.xlabel('Recall')
+    plt.ylabel('Precision')
+    plt.axis([0, 1, 0, 1])
+    plt.savefig(f"./experiment_001_epoch_{best_epoch}_lstm.png")
+
     print('===== End of Adversarial Training =====')
     print('Dataset: {}| Anomalous class: {}| Best test {}: {}'.format(args.dataset, ano_class, evaluation, round(best_test,3)))
     

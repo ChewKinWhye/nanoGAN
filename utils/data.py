@@ -1,5 +1,6 @@
 import numpy as np
 from keras.datasets import mnist, cifar10
+import csv
 
 def preprocess(x):
     x = np.float64(x)
@@ -15,6 +16,67 @@ def load_data(args):
         return get_mnist(args.ano_class)
     elif args.dataset == 'cifar10':
         return get_cifar10(args.ano_class)
+    elif args.dataset == "ecoli":
+        return get_ecoli(args.ano_class)
+
+def get_ecoli(ano_class):
+    train_size = 100000
+    test_size = 20000
+    modification_ratio = 0.1
+    # Global parameters
+    file_path_normal = "./data/pcr.tsv"
+    file_path_modified = "./data/msssi.tsv"
+
+    test_from_non_modified = int(test_size * (1 - modification_ratio))
+    total_from_non_modified = int(test_from_non_modified + train_size)
+    test_from_modified = int(test_size * modification_ratio)
+    # Extract data from non-modified
+    with open(file_path_normal) as tsv_file:
+        read_tsv = csv.reader(tsv_file, delimiter="\t")
+        train_data = []
+        data_count = 0
+        for row in read_tsv:
+            if data_count == total_from_non_modified:
+                break
+            # The second last row contains the 360 signal values, separated by commas
+            row_data = row[-2].split(",")
+            row_data_float = [float(i) for i in row_data]
+            # Check for data inconsistencies, and to only use the template strand
+            if row[5].lower() == 'c' or len(row_data) != 360 or row[-1] != "0" or max(row_data_float) > 5 or min(row_data_float) < -5:
+                continue
+            # The last row represents the methylation state. We only want to train the model on unmethylated datapoints
+            row_data_float = [float(i) for i in row_data]
+            train_data.append(row_data_float)
+            data_count += 1
+
+    with open(file_path_modified) as tsv_file:
+        read_tsv = csv.reader(tsv_file, delimiter="\t")
+        test_data = []
+        data_count = 0
+        for i, row in enumerate(read_tsv):
+            # 3000 test data points
+            if data_count == test_from_modified:
+                break
+            # The second last row contains the 360 signal values, separated by commas
+            row_data = row[-2].split(",")
+            row_data_float = [float(i) for i in row_data]
+            # Check for data inconsistencies, and to only use the template strand
+            if row[5].lower() == 'c' or len(row_data) != 360 or row[-1] != "1" or max(row_data_float) > 5 or min(row_data_float) < -5:
+                continue
+            # The last row represents the methylation state. We only want to train the model on unmethylated datapoints
+            row_data_float = [float(i) for i in row_data]
+            test_data.append(row_data_float)
+            data_count += 1
+
+    test_data.extend(train_data[-test_from_non_modified:])
+    test_data = np.asarray(test_data)
+    train_data = np.asarray(train_data[0:-test_from_non_modified])
+    test_data_labels = np.append(np.ones(test_from_modified), np.zeros(test_from_non_modified))
+    print(f"Train data shape: {train_data.shape}")
+    print(f"Test data shape: {test_data.shape}")
+    print(f"Test data labels shape: {test_data_labels.shape}")
+    return train_data, test_data, test_data_labels, test_data, test_data_labels
+
 
 def get_mnist(ano_class):
     

@@ -4,9 +4,9 @@ import tensorflow as tf
 
 import keras.backend as K
 from keras import losses
-from keras.models import Model
+from keras.models import Model, Sequential
 from keras.layers import Flatten, Reshape, Conv2D, Conv2DTranspose, LeakyReLU
-from keras.layers import Input, Dense, BatchNormalization, Activation, Dropout
+from keras.layers import Input, Dense, BatchNormalization, Activation, Dropout, Bidirectional, LSTM, Embedding
 from keras.regularizers import l2
 from keras.optimizers import Adam
 
@@ -17,6 +17,8 @@ def load_model(args):
         return get_mnist_model(args)
     if args.dataset == 'cifar10':
         return get_cifar10_model(args)
+    if args.dataset == "ecoli":
+        return get_ecoli_model(args)
     
 def set_trainability(model, trainable=False): #alternate to freeze D network while training only G in (G+D) combination
     model.trainable = trainable
@@ -27,6 +29,68 @@ def D_loss(y_true, y_pred):
     loss_gen = losses.binary_crossentropy(y_true,y_pred)
     loss = gamma * loss_gen
     return loss
+
+
+def get_ecoli_model(args):
+    '''
+    Return: G, D, GAN
+    '''
+
+    '''
+    Building Generator
+    '''
+    '''
+    init_kernel = 'random_normal'
+    G = Sequential()
+    G.add(Dense(256, input_dim=args.latent_dim))
+    G.add(LeakyReLU(alpha=0.2))
+    G.add(BatchNormalization(momentum=0.8))
+    G.add(Dense(512))
+    G.add(LeakyReLU(alpha=0.2))
+    G.add(BatchNormalization(momentum=0.8))
+    G.add(Dense(1024))
+    G.add(LeakyReLU(alpha=0.2))
+    G.add(BatchNormalization(momentum=0.8))
+    G.add(Dense(360, activation='tanh'))
+    '''
+    G = Sequential()
+    G.add(Dense(args.latent_dim, input_dim=args.latent_dim))
+    G.add(LeakyReLU(alpha=0.2))
+    G.add(BatchNormalization(momentum=0.8))
+    G.add(Reshape((args.latent_dim,1)))
+    G.add(LSTM(360))
+    '''
+    Builiding Discriminator
+    '''
+    '''
+    D = Sequential()
+    D.add(Dense(512, input_dim=360))
+    D.add(LeakyReLU(alpha=0.2))
+    D.add(Dense(256))
+    D.add(LeakyReLU(alpha=0.2))
+    D.add(Dense(1, activation='sigmoid'))
+    dopt = Adam(lr=args.d_lr, beta_1=0.5, beta_2=0.999)
+    D.compile(loss=D_loss, optimizer=dopt)
+    '''
+    D = Sequential()
+    D.add(Reshape((360, 1), input_shape=(360,)))
+    D.add(LSTM(4))
+    D.add(Dense(4, activation='relu'))
+    D.add(Dense(1, activation='sigmoid'))
+    dopt = Adam(lr=args.d_lr, beta_1=0.5, beta_2=0.999)
+    D.compile(loss=D_loss, optimizer=dopt)
+    '''
+    Building GAN
+    '''
+    set_trainability(D, False)
+    GAN_in = Input(shape=(args.latent_dim,))
+    G_out = G(GAN_in)
+    GAN_out = D(G_out)
+    GAN = Model(GAN_in, GAN_out)
+
+    gopt = Adam(lr=args.g_lr, beta_1=0.5, beta_2=0.999)
+    GAN.compile(loss=com_conv(G_out, args.beta, 2), optimizer=gopt)
+    return G, D, GAN
 
 def get_cifar10_model(args):
     '''

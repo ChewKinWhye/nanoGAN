@@ -34,26 +34,25 @@ def compute_au(D, G, GAN, x_val, y_val, x_test, y_test, mode):
     if mode == 'auprc':
         ###VALIDATION
         y_pred_val = np.squeeze(D.predict(x_val))
-        precision, recall, _ = precision_recall_curve(y_val, y_pred_val)
+        y_pred_val_inv = 1 - y_pred_val
+        precision, recall, _ = precision_recall_curve(y_val, y_pred_val_inv)
         val_prc = auc(recall, precision)
         ###TEST
         y_pred_test = np.squeeze(D.predict(x_test))
-        precision, recall, _ = precision_recall_curve(y_test, y_pred_test)
+        y_pred_test_inv = 1 - y_pred_test
+        precision, recall, _ = precision_recall_curve(y_test, y_pred_test_inv)
         test_prc = auc(recall, precision)
     
-        return val_prc, test_prc
-    
-    elif mode == 'auroc':
         ###VALIDATION
-        y_pred_val = np.squeeze(D.predict(x_val))
+        y_pred_val = 1 - np.squeeze(D.predict(x_val))
         fpr, tpr, _ = roc_curve(y_val, y_pred_val)
         val_roc = auc(fpr, tpr)
         ###TEST
-        y_pred_test = np.squeeze(D.predict(x_test))
+        y_pred_test = 1 - np.squeeze(D.predict(x_test))
         fpr, tpr, _ = roc_curve(y_test, y_pred_test)
         test_roc = auc(fpr, tpr)
         
-        return val_roc, test_roc
+        return val_prc, test_prc, precision, recall, fpr, tpr, val_roc
         
 
 def histogram(G, D, GAN, x_test, y_test, result_path, latent_dim):

@@ -1,0 +1,238 @@
+
+Epoch: 1
+	 Val_auprc: 0.095 
+	 Test_auprc: 0.095
+Epoch: 2
+	 Val_auprc: 0.095 
+	 Test_auprc: 0.095
+Epoch: 3
+	 Val_auprc: 0.093 
+	 Test_auprc: 0.093
+Epoch: 4
+	 Val_auprc: 0.092 
+	 Test_auprc: 0.092
+Epoch: 5
+	 Val_auprc: 0.092 
+	 Test_auprc: 0.092
+Epoch: 6
+	 Val_auprc: 0.094 
+	 Test_auprc: 0.094
+Epoch: 7
+	 Val_auprc: 0.099 
+	 Test_auprc: 0.099
+Epoch: 8
+	 Val_auprc: 0.110 
+	 Test_auprc: 0.110
+Epoch: 9
+	 Val_auprc: 0.129 
+	 Test_auprc: 0.129
+Epoch: 10
+	 Val_auprc: 0.148 
+	 Test_auprc: 0.148
+Epoch: 11
+	 Val_auprc: 0.162 
+	 Test_auprc: 0.162
+Epoch: 12
+	 Val_auprc: 0.153 
+	 Test_auprc: 0.153
+Epoch: 13
+	 Val_auprc: 0.121 
+	 Test_auprc: 0.121
+Epoch: 14
+	 Val_auprc: 0.108 
+	 Test_auprc: 0.108
+Epoch: 15
+	 Val_auprc: 0.101 
+	 Test_auprc: 0.101
+Epoch: 16
+	 Val_auprc: 0.100 
+	 Test_auprc: 0.100
+Epoch: 17
+	 Val_auprc: 0.099 
+	 Test_auprc: 0.099
+Epoch: 18
+	 Val_auprc: 0.097 
+	 Test_auprc: 0.097
+Epoch: 19
+	 Val_auprc: 0.099 
+	 Test_auprc: 0.099
+Epoch: 20
+	 Val_auprc: 0.103 
+	 Test_auprc: 0.103
+Epoch: 21
+	 Val_auprc: 0.114 
+	 Test_auprc: 0.114
+Epoch: 22
+	 Val_auprc: 0.124 
+	 Test_auprc: 0.124
+Epoch: 23
+	 Val_auprc: 0.118 
+	 Test_auprc: 0.118
+Epoch: 24
+	 Val_auprc: 0.107 
+	 Test_auprc: 0.107
+Epoch: 25
+	 Val_auprc: 0.101 
+	 Test_auprc: 0.101
+Epoch: 26
+	 Val_auprc: 0.104 
+	 Test_auprc: 0.104
+Epoch: 27
+	 Val_auprc: 0.104 
+	 Test_auprc: 0.104
+Epoch: 28
+	 Val_auprc: 0.103 
+	 Test_auprc: 0.103
+Epoch: 29
+	 Val_auprc: 0.102 
+	 Test_auprc: 0.102
+Epoch: 30
+	 Val_auprc: 0.097 
+	 Test_auprc: 0.097
+Epoch: 31
+	 Val_auprc: 0.098 
+	 Test_auprc: 0.098
+Epoch: 32
+	 Val_auprc: 0.099 
+	 Test_auprc: 0.099
+Epoch: 33
+	 Val_auprc: 0.098 
+	 Test_auprc: 0.098
+Epoch: 34
+	 Val_auprc: 0.091 
+	 Test_auprc: 0.091
+Epoch: 35
+	 Val_auprc: 0.088 
+	 Test_auprc: 0.088
+Epoch: 36
+	 Val_auprc: 0.094 
+	 Test_auprc: 0.094
+Epoch: 37
+	 Val_auprc: 0.109 
+	 Test_auprc: 0.109
+Epoch: 38
+	 Val_auprc: 0.107 
+	 Test_auprc: 0.107
+Epoch: 39
+	 Val_auprc: 0.100 
+	 Test_auprc: 0.100
+Epoch: 40
+	 Val_auprc: 0.098 
+	 Test_auprc: 0.098
+Epoch: 41
+	 Val_auprc: 0.098 
+	 Test_auprc: 0.098
+Epoch: 42
+	 Val_auprc: 0.110 
+	 Test_auprc: 0.110
+Epoch: 43
+	 Val_auprc: 0.110 
+	 Test_auprc: 0.110
+Epoch: 44
+	 Val_auprc: 0.100 
+	 Test_auprc: 0.100
+Epoch: 45
+	 Val_auprc: 0.101 
+	 Test_auprc: 0.101
+Epoch: 46
+	 Val_auprc: 0.096 
+	 Test_auprc: 0.096
+Epoch: 47
+	 Val_auprc: 0.090 
+	 Test_auprc: 0.090
+Epoch: 48
+	 Val_auprc: 0.090 
+	 Test_auprc: 0.090
+Epoch: 49
+	 Val_auprc: 0.085 
+	 Test_auprc: 0.085
+Epoch: 50
+	 Val_auprc: 0.085 
+	 Test_auprc: 0.085
+Epoch: 51
+	 Val_auprc: 0.085 
+	 Test_auprc: 0.085
+Epoch: 52
+	 Val_auprc: 0.083 
+	 Test_auprc: 0.083
+Epoch: 53
+	 Val_auprc: 0.083 
+	 Test_auprc: 0.083
+Epoch: 54
+	 Val_auprc: 0.082 
+	 Test_auprc: 0.082
+Epoch: 55
+	 Val_auprc: 0.096 
+	 Test_auprc: 0.096
+Epoch: 56
+	 Val_auprc: 0.095 
+	 Test_auprc: 0.095
+Epoch: 57
+	 Val_auprc: 0.095 
+	 Test_auprc: 0.095
+Epoch: 58
+	 Val_auprc: 0.086 
+	 Test_auprc: 0.086
+Epoch: 59
+	 Val_auprc: 0.088 
+	 Test_auprc: 0.088
+Epoch: 60
+	 Val_auprc: 0.095 
+	 Test_auprc: 0.095
+Epoch: 61
+	 Val_auprc: 0.099 
+	 Test_auprc: 0.099
+Epoch: 62
+	 Val_auprc: 0.101 
+	 Test_auprc: 0.101
+Epoch: 63
+	 Val_auprc: 0.106 
+	 Test_auprc: 0.106
+Epoch: 64
+	 Val_auprc: 0.099 
+	 Test_auprc: 0.099
+Epoch: 65
+	 Val_auprc: 0.099 
+	 Test_auprc: 0.099
+Epoch: 66
+	 Val_auprc: 0.094 
+	 Test_auprc: 0.094
+Epoch: 67
+	 Val_auprc: 0.096 
+	 Test_auprc: 0.096
+Epoch: 68
+	 Val_auprc: 0.089 
+	 Test_auprc: 0.089
+Epoch: 69
+	 Val_auprc: 0.084 
+	 Test_auprc: 0.084
+Epoch: 70
+	 Val_auprc: 0.086 
+	 Test_auprc: 0.086
+Epoch: 71
+	 Val_auprc: 0.094 
+	 Test_auprc: 0.094
+Epoch: 72
+	 Val_auprc: 0.099 
+	 Test_auprc: 0.099
+Epoch: 73
+	 Val_auprc: 0.106 
+	 Test_auprc: 0.106
+Epoch: 74
+	 Val_auprc: 0.113 
+	 Test_auprc: 0.113
+Epoch: 75
+	 Val_auprc: 0.102 
+	 Test_auprc: 0.102
+Epoch: 76
+	 Val_auprc: 0.095 
+	 Test_auprc: 0.095
+Epoch: 77
+	 Val_auprc: 0.093 
+	 Test_auprc: 0.093
+Epoch: 78
+	 Val_auprc: 0.092 
+	 Test_auprc: 0.092
+Epoch: 79
+	 Val_auprc: 0.094 
+	 Test_auprc: 0.094

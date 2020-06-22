@@ -1,0 +1,4 @@
+
+Epoch: 1
+	 Val_auprc: 0.159 
+	 Test_auprc: 0.159
