@@ -23,7 +23,7 @@ This is the official implementation of the paper: Fence GAN: Towards Better Anom
 Check results and plots under `result` folder
 ### Ecoli data set
 ```
-python main.py --epochs 1 --alpha 0.1 --beta 30 --gamma 0.1 --pretrain 1 --d_lr 1e-5 --g_lr 2e-5  --latent_dim 200 --data_size 100000
+python main.py --epochs 150 --alpha 0.1 --beta 30 --gamma 0.1 --pretrain 15 --d_lr 1e-5 --g_lr 2e-5  --latent_dim 200 --data_size 100000
 ```
 
 ### More training option
