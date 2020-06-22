@@ -22,8 +22,9 @@ This is the official implementation of the paper: Fence GAN: Towards Better Anom
 ## Anomaly Detection
 Check results and plots under `result` folder
 ### Ecoli data set
+```
 python main.py --epochs 1 --alpha 0.1 --beta 30 --gamma 0.1 --pretrain 1 --d_lr 1e-5 --g_lr 2e-5  --latent_dim 200 --data_size 1000
-
+```
 
 ### More training option
 Enter `python3 main.py -h` for more training options
