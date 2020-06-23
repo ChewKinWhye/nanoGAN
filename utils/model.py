@@ -3,11 +3,27 @@ from utils.custom_losses import *
 import keras.backend as K
 from keras import losses
 from keras.models import Model, Sequential
-from keras.layers import Reshape, LeakyReLU, Input, Dense, BatchNormalization, Bidirectional, LSTM
+from keras.layers import Reshape, LeakyReLU, Input, Dense, BatchNormalization, Bidirectional, LSTM, Layer
 from keras.optimizers import Adam
 
 gamma = K.variable([1])
 
+
+class Linear(Layer):
+    def __init__(self, units=32, input_dim=32):
+        super(Linear, self).__init__()
+        w_init = tf.random_normal_initializer()
+        self.w = tf.Variable(
+            initial_value=w_init(shape=(input_dim, units), dtype="float32"),
+            trainable=True,
+        )
+        b_init = tf.zeros_initializer()
+        self.b = tf.Variable(
+            initial_value=b_init(shape=(units,), dtype="float32"), trainable=True
+        )
+
+    def call(self, inputs):
+        return tf.matmul(inputs, self.w) + self.b
 
 def set_trainability(model, trainable=False):
     # Alternate to freeze D network while training only G in (G+D) combination
@@ -22,7 +38,7 @@ def d_loss(y_true, y_predicted):
     return loss
 
 
-def load_model(args):
+def load_deep_signal_model(args):
     # Building Generator
     G = Sequential()
     G.add(Dense(args.latent_dim, input_dim=args.latent_dim))
@@ -32,11 +48,13 @@ def load_model(args):
     G.add(LSTM(428))
 
     # Building Discriminator
-    D = Sequential()
-    D.add(Reshape((428, 1), input_shape=(428,)))
-    D.add(LSTM(4))
-    D.add(Dense(4, activation='relu'))
-    D.add(Dense(1, activation='sigmoid'))
+    D_in = Input(shape=(428,))
+    x = Linear(units=428, input_dim=428)(D_in)
+    x = Reshape((428, 1))(x)
+    x = LSTM(4)(x)
+    x = Dense(4, activation='relu')(x)
+    D_out = Dense(1, activation='sigmoid')(x)
+    D = Model(D_in, D_out)
     d_opt = Adam(lr=args.d_lr, beta_1=0.5, beta_2=0.999)
     D.compile(loss=d_loss, optimizer=d_opt)
 
