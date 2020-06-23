@@ -1,7 +1,3 @@
-# Fence GAN: Towards Better Anomaly Detection
-
-This is the official implementation of the paper: Fence GAN: Towards Better Anomaly Detection [(link)](https://arxiv.org/abs/1904.01209).
-
 ## Prerequisites
 1. Linux OS
 2. Python 3
@@ -10,7 +6,7 @@ This is the official implementation of the paper: Fence GAN: Towards Better Anom
 ## Installation
 1. Clone repository
     ```
-    git clone https://github.com/phuccuongngo99/Fence_GAN.git
+    git clone https://github.com/ChewKinWhye/nanoGAN.git
     ```
 2. Installing tensorflow or tensorflow-gpu by following instruction [here](https://www.tensorflow.org/install/pip).
 
@@ -20,7 +16,7 @@ This is the official implementation of the paper: Fence GAN: Towards Better Anom
     ```
 
 ## Anomaly Detection
-Check results and plots under `result` folder
+Check results and plots under `results` folder
 ### Ecoli data set
 ```
 python main.py --epochs 150 --alpha 0.1 --beta 30 --gamma 0.1 --pretrain 15 --d_lr 1e-5 --g_lr 2e-5  --latent_dim 200 --data_size 100000
