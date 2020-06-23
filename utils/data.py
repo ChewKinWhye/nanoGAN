@@ -30,7 +30,7 @@ def load_data(args):
     train_size = int(args.data_size * 0.8)
     test_size = int(20000 * 0.2)
     modification_ratio = 0.1
-
+    dna_lookup = {"A": 0, "T": 1, "G": 2, "C": 3}
     # Global parameters
     file_path_normal = os.path.join(args.data_path, "pcr.tsv")
     file_path_modified = os.path.join(args.data_path, "msssi.tsv")
@@ -47,14 +47,15 @@ def load_data(args):
             if data_count == total_from_non_modified:
                 break
             # The second last row contains the 360 signal values, separated by commas
-            row_data = row[-2].split(",")
+            row_data = row[7].split(",")
+            row_data.extend(row[8].split(","))
+            row_data.extend(row[9].split(","))
+            row_data.extend(row[10].split(","))
             row_data_float = [float(i) for i in row_data]
             # Check for data inconsistencies, and to only use the template strand
-            if row[5].lower() == 'c' or len(row_data) != 360 or row[-1] != "0" or max(row_data_float) > 5 or min(
-                    row_data_float) < -5:
+            if row[5].lower() == 'c' or len(row_data) != 360 or row[-1] != "0":
                 continue
             # The last row represents the methylation state. We only want to train the model on unmethylated datapoints
-            row_data_float = [float(i) for i in row_data]
             train_data.append(row_data_float)
             data_count += 1
 
@@ -67,14 +68,15 @@ def load_data(args):
             if data_count == test_from_modified:
                 break
             # The second last row contains the 360 signal values, separated by commas
-            row_data = row[-2].split(",")
+            row_data = row[7].split(",")
+            row_data.extend(row[8].split(","))
+            row_data.extend(row[9].split(","))
+            row_data.extend(row[10].split(","))
             row_data_float = [float(i) for i in row_data]
             # Check for data inconsistencies, and to only use the template strand
-            if row[5].lower() == 'c' or len(row_data) != 360 or row[-1] != "1" or max(row_data_float) > 5 or min(
-                    row_data_float) < -5:
+            if row[5].lower() == 'c' or len(row_data) != 360 or row[-1] != "1":
                 continue
             # The last row represents the methylation state. We only want to train the model on unmethylated datapoints
-            row_data_float = [float(i) for i in row_data]
             test_data.append(row_data_float)
             data_count += 1
 
