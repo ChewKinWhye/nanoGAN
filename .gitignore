@@ -1,5 +1,5 @@
 data
-**/__pycache__*
+utils/__pycache__
 *png
 result
 nanoGAN_env
