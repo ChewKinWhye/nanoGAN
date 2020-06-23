@@ -1,6 +1,6 @@
 data
 utils/__pycache__
 *png
-result
+results
 nanoGAN_env
 .idea
