@@ -29,11 +29,11 @@ def load_model(args):
     G.add(LeakyReLU(alpha=0.2))
     G.add(BatchNormalization(momentum=0.8))
     G.add(Reshape((args.latent_dim, 1)))
-    G.add(LSTM(360))
+    G.add(LSTM(428))
 
     # Building Discriminator
     D = Sequential()
-    D.add(Reshape((360, 1), input_shape=(360,)))
+    D.add(Reshape((428, 1), input_shape=(428,)))
     D.add(LSTM(4))
     D.add(Dense(4, activation='relu'))
     D.add(Dense(1, activation='sigmoid'))
