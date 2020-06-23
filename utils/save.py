@@ -22,11 +22,13 @@ def save_results(args, results, y_test):
     result_path = f'./results/{args.output_filename}/'
 
     result_json = {
-        "best_au_prc": round(results[0], 3),
-        "best_au_roc": round(results[3], 3)}
+        "Best au_prc": round(results[0], 3),
+        "Best au_roc": round(results[3], 3),
+        "Best accuracy": round(results[6], 3),
+        "Best F-Measure": round(results[7], 3)}
 
     with open(f'{result_path}/result.json', 'w+') as outfile:
         json.dump(result_json, outfile, indent=4)
 
-    plt = plot_prc(results, y_test)
+    plt = plot_prc(results, y_test, args.threshold)
     plt.savefig(f"{result_path}/prc.png")

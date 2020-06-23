@@ -1,4 +1,6 @@
 {
-    "best_au_prc": 0.125,
-    "best_au_roc": 0.495
+    "Best au_prc": 0.124,
+    "Best au_roc": 0.491,
+    "Best accuracy": 0.839,
+    "Best F-Measure": 0.517
 }

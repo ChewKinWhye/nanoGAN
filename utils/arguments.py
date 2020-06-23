@@ -10,6 +10,7 @@ def parse_args():
     parser.add_argument('--beta', type=float, default=30, help='beta')
     parser.add_argument('--gamma', type=float, default=0.1, help='gamma')
     parser.add_argument('--alpha', type=float, default=0.5, help='alpha')
+    parser.add_argument('--threshold', type=float, default=0.5, help='threshold')
 
     # Other hyper-parameters
     parser.add_argument('--epochs', type=int, default=30, help='number of epochs to train')
