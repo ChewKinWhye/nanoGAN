@@ -45,7 +45,8 @@ def train(args, generator, discriminator, GAN, x_train, x_test, y_test, x_val, y
     latent_dim = args.latent_dim
 
     d_loss, g_loss = [], []
-    best_au_roc_val, best_au_prc, best_recall, best_precision, best_au_roc, best_fpr, best_tpr = 0, 0, 0, 0, 0, 0, 0
+    au_prc_val, best_au_roc_val, best_au_prc, best_recall, best_precision, best_au_roc, best_fpr, best_tpr \
+        = 0, 0, 0, 0, 0, 0, 0, 0
 
     print('===== Start of Adversarial Training =====')
     for epoch in range(epochs):
@@ -82,7 +83,7 @@ def train(args, generator, discriminator, GAN, x_train, x_test, y_test, x_val, y
         if (epoch + 1) % v_freq == 0:
             # Check for the best validation results
             y_predicted = 1 - np.squeeze(discriminator.predict(x_val))
-            _, _, _, au_roc_val, _, _ = compute_metrics(y_predicted, y_val)
+            au_prc_val, _, _, au_roc_val, _, _ = compute_metrics(y_predicted, y_val)
 
             if au_roc_val > best_au_roc_val:
                 best_au_roc_val = au_roc_val
@@ -92,7 +93,8 @@ def train(args, generator, discriminator, GAN, x_train, x_test, y_test, x_val, y
                     = compute_metrics(y_predicted, y_test)
                 save_model(args, discriminator)
                 
-            print(f"\tGen. Loss: {g_loss[-1]:.3f}\n\tDisc. Loss: {d_loss[-1]:.3f}\n\t: {au_roc_val:.3f}")
+            print(f"\tGen. Loss: {g_loss[-1]:.3f}\n\tDisc. Loss: {d_loss[-1]:.3f}\n\t: Au-roc: {au_roc_val:.3f}")
+            print(f"\tAu-prc: {au_prc_val:.3f}")
         else:
             print(f"\tGen. Loss: {g_loss[-1]:.3f}\n\tDisc. Loss: {d_loss[-1]:.3f}")
 
