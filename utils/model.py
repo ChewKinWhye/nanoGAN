@@ -4,45 +4,12 @@ import keras.backend as K
 from keras import losses
 from keras.models import Model, Sequential
 from keras.layers import Reshape, LeakyReLU, Input, Dense, BatchNormalization, LSTM,\
-    Layer, Lambda, Permute, Flatten, add
+    Layer, Lambda, Permute, Flatten, add, Bidirectional, Concatenate, Conv1D, Conv2D,\
+    MaxPooling1D, MaxPooling2D, AveragePooling2D
 from keras.optimizers import Adam
+from keras.layers import LeakyReLU
 
 gamma = K.variable([1])
-
-
-class SequenceFeature(Model):
-    def __init__(self):
-        super(SequenceFeature, self).__init__()
-        self.f_lstm_1 = LSTM(100)
-        self.f_lstm_2 = LSTM(100)
-        self.f_lstm_3 = LSTM(100)
-        self.b_lstm_1 = LSTM(100)
-        self.b_lstm_2 = LSTM(100)
-        self.b_lstm_3 = LSTM(100)
-        self.reverse = Lambda(lambda x: K.reverse(x, axes=1))
-        self.reshape1 = Reshape((4, 17))
-        self.reshape2 = Reshape((100, 1))
-        self.permute = Permute((2, 1), input_shape=(4, 17))
-
-    def call(self, inputs):
-        reshaped = self.permute(self.reshape1(inputs))
-        layer_1_out = self.reshape2(self.reverse(self.b_lstm_1(self.reshape2(self.reverse(self.f_lstm_1(reshaped))))))
-        layer_2_out = self.reshape2(self.reverse(self.b_lstm_2(self.reshape2(self.reverse(self.f_lstm_2(layer_1_out))))))
-        layer_3_out = self.reverse(self.b_lstm_3(self.reshape2(self.reverse(self.f_lstm_3(layer_2_out)))))
-        return layer_3_out
-
-
-class Custom(Layer):
-    def __init__(self):
-        super(Custom, self).__init__()
-        # self.dense2 = Dense(428, activation='relu')
-        self.top_layer = Lambda(lambda x: x[:, 0:-360])
-        self.bottom_layer = Lambda(lambda x: x[-360:])
-        self.sequence_feature = SequenceFeature()
-        self.dense = Dense(1, activation='relu')
-
-    def call(self, inputs):
-        return self.dense(self.top_layer(inputs))
 
 
 def set_trainability(model, trainable=False):
@@ -60,27 +27,47 @@ def d_loss(y_true, y_predicted):
 
 def load_deep_signal_model(args):
     # Building Generator
-    G = Sequential()
-    G.add(Dense(args.latent_dim, input_dim=args.latent_dim))
-    G.add(LeakyReLU(alpha=0.2))
-    G.add(BatchNormalization(momentum=0.8))
-    G.add(Reshape((args.latent_dim, 1)))
-    G.add(LSTM(428))
+    g_in = Input(shape=(args.latent_dim,))
+    x = Dense(300, activation='relu')(g_in)
+    ffnn_out = Dense(400, activation='relu')(x)
+    # Top module model
+    top_module = Lambda(lambda x: x[:, 0:100])(ffnn_out)
+    x = Reshape((100, 1))(top_module)
+    x = Bidirectional(LSTM(50))(x)
+    x = Reshape((100, 1))(x)
+    top_out = LSTM(68)(x)
+    # Bottom module model
+    bottom_module = Lambda(lambda x:x[:, 100:])(ffnn_out)
+    x = Reshape((1, 300, 1))(bottom_module)
+    x = Conv2D(filters=32, kernel_size=(1, 7), strides=1)(x)
+    x = AveragePooling2D(pool_size=(1, 3), strides=2)(x)
+    x = Reshape((-1, 1))(x)
+    x = Bidirectional(LSTM(50))(x)
+    bottom_out = Dense(360)(x)
+    g_out = Concatenate(axis=1)([top_out, bottom_out])
+    G = Model(g_in, g_out)
 
     # Building Discriminator
     d_in = Input(shape=(428,))
-    print(d_in.shape)
     # Top module to process 4*17 features using LSTM
     top_module = Lambda(lambda x: x[:, 0:-360])(d_in)
-    print(top_module.shape)
     x = Reshape((68, 1))(top_module)
-    top_out = LSTM(100)(x)
+    x = Bidirectional(LSTM(50))(x)
+    x = Reshape((100, 1))(x)
+    top_out = Bidirectional(LSTM(50))(x)
     # Bottom model to process 360 signals using CNN
     bottom_module = Lambda(lambda x: x[:, -360:])(d_in)
-    bottom_out = Dense(100)(bottom_module)
+    x = Reshape((1, 360, 1))(bottom_module)
+    x = Conv2D(filters=32, kernel_size=(1, 7), strides=2)(x)
+    # Add in inception layers
+    x = AveragePooling2D(pool_size=(1, 7), strides=5)(x)
+    x = AveragePooling2D(pool_size=(1, 5), strides=3)(x)
+    print(x.shape)
+    bottom_out = Reshape((-1,))(x)
     # Classification module which combines top and bottom outputs using FFNN
-    classification_in = add([top_out, bottom_out])
-    d_out = Dense(1)(classification_in)
+    classification_in = Concatenate(axis=1)([top_out, bottom_out])
+    x = Dense(32, activation='relu')(classification_in)
+    d_out = Dense(1, activation='sigmoid')(x)
     d_opt = Adam(lr=args.d_lr, beta_1=0.5, beta_2=0.999)
     D = Model(d_in, d_out)
     D.compile(loss=d_loss, optimizer=d_opt)
