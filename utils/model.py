@@ -69,11 +69,14 @@ def load_deep_signal_model(args):
 
     # Building Discriminator
     d_in = Input(shape=(428,))
+    print(d_in.shape)
     # Top module to process 4*17 features using LSTM
-    top_module = Lambda(lambda x: x[-360:])(d_in)
-    top_out = LSTM(100)(top_module)
+    top_module = Lambda(lambda x: x[:, 0:-360])(d_in)
+    print(top_module.shape)
+    x = Reshape((68, 1))(top_module)
+    top_out = LSTM(100)(x)
     # Bottom model to process 360 signals using CNN
-    bottom_module = Lambda(lambda x: x[-360:])(d_in)
+    bottom_module = Lambda(lambda x: x[:, -360:])(d_in)
     bottom_out = Dense(100)(bottom_module)
     # Classification module which combines top and bottom outputs using FFNN
     classification_in = add([top_out, bottom_out])
