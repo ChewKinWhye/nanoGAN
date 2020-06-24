@@ -1,4 +1,3 @@
-import scipy
 import numpy as np
 from tqdm import trange
 

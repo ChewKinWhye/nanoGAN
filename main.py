@@ -6,11 +6,12 @@ from utils.save import save_results
 
 import numpy as np
 import tensorflow as tf
+tf.config.experimental_run_functions_eagerly(True)
 
 args = parse_args()
 
 np.random.seed(args.seed)
-tf.set_random_seed(args.seed)
+tf.compat.v1.set_random_seed(args.seed)
 
 x_train, x_test, y_test, x_val, y_val = load_data(args)
 generator, discriminator, GAN = load_deep_signal_model(args)
