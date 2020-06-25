@@ -6,8 +6,7 @@ from utils.evaluate import compute_metrics
 from utils.data import D_data, noise_data
 from utils.save import save_model
 import time
-import os
-#os.environ["CUDA_VISIBLE_DEVICES"] = ""
+
 def pre_train(args, generator, discriminator, x_train):
     # Pre-train discriminator, Generator is not trained
     print("===== Start of Pre-training =====")
