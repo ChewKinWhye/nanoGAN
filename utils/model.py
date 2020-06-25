@@ -81,6 +81,7 @@ def load_deep_signal_model(args):
 
     g_opt = Adam(lr=args.g_lr, beta_1=0.5, beta_2=0.999)
     gan.compile(loss=fence_loss(g_out, args.beta, 2), optimizer=g_opt)
+    #gan.compile(loss='binary_crossentropy', optimizer=g_opt)
     return G, D, gan
 
 
@@ -111,4 +112,5 @@ def load_model(args):
 
     g_opt = Adam(lr=args.g_lr, beta_1=0.5, beta_2=0.999)
     gan.compile(loss=fence_loss(g_out, args.beta, 2), optimizer=g_opt)
+    gan.summary()
     return G, D, gan

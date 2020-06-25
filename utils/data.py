@@ -20,7 +20,7 @@ def D_data(n_samples, G, mode, x_train, latent_dim):
     # Feeding training data for generated case
     if mode == 'gen':
         noise = noise_data(n_samples, latent_dim)
-        x_gen = G.predict(noise)
+        x_gen = G.predict_on_batch(noise)
         y0 = np.zeros(n_samples)
 
         return x_gen, y0

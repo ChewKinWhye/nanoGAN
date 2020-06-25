@@ -5,8 +5,9 @@ from utils.model import K, gamma, set_trainability
 from utils.evaluate import compute_metrics
 from utils.data import D_data, noise_data
 from utils.save import save_model
-
-
+import time
+import os
+#os.environ["CUDA_VISIBLE_DEVICES"] = ""
 def pre_train(args, generator, discriminator, x_train):
     # Pre-train discriminator, Generator is not trained
     print("===== Start of Pre-training =====")
@@ -21,12 +22,10 @@ def pre_train(args, generator, discriminator, x_train):
                 K.set_value(gamma, [1])
                 x, y = D_data(batch_size, generator, 'normal', x_train, latent_dim)
                 loss += discriminator.train_on_batch(x, y)
-                
                 set_trainability(discriminator, True)
                 K.set_value(gamma, [args.gamma])
                 x, y = D_data(batch_size, generator, 'gen', x_train, latent_dim)
                 loss += discriminator.train_on_batch(x, y)
-                
                 t.set_postfix(D_loss=loss/2)
         print(f"\tDisc. Loss: {loss/2:.3f}")
     print("===== End of Pre-training =====")
@@ -50,17 +49,14 @@ def train(args, generator, discriminator, GAN, x_train, x_test, y_test, x_val, y
                 for _ in t:
                     # Train Discriminator
                     loss_temp = []
-                    
                     set_trainability(discriminator, True)
                     K.set_value(gamma, [1])
                     x, y = D_data(batch_size, generator, 'normal', x_train, latent_dim)
                     loss_temp.append(discriminator.train_on_batch(x, y))
-                    
                     set_trainability(discriminator, True)
                     K.set_value(gamma, [args.gamma])
                     x, y = D_data(batch_size, generator, 'gen', x_train, latent_dim)
                     loss_temp.append(discriminator.train_on_batch(x, y))
-                    
                     d_loss.append(sum(loss_temp)/len(loss_temp))
                     
                     # Train Generator
@@ -69,7 +65,6 @@ def train(args, generator, discriminator, GAN, x_train, x_test, y_test, x_val, y
                     y = np.zeros(batch_size)
                     y[:] = args.alpha
                     g_loss.append(GAN.train_on_batch(x, y))
-                    
                     t.set_postfix(G_loss=g_loss[-1], D_loss=d_loss[-1])
         except KeyboardInterrupt:
             # hit control-C to exit
@@ -77,14 +72,14 @@ def train(args, generator, discriminator, GAN, x_train, x_test, y_test, x_val, y
         
         if (epoch + 1) % v_freq == 0:
             # Check for the best validation results
-            y_predicted = 1 - np.squeeze(discriminator.predict(x_val))
+            y_predicted = 1 - np.squeeze(discriminator.predict_on_batch(x_val))
             au_prc_val, _, _, au_roc_val, _, _, accuracy_val, f_measure_val = \
                 compute_metrics(y_predicted, y_val, args.threshold)
 
             if au_roc_val > best_au_roc_val:
                 best_au_roc_val = au_roc_val
                 # Save the best test results
-                y_predicted = 1 - np.squeeze(discriminator.predict(x_test))
+                y_predicted = 1 - np.squeeze(discriminator.predict_on_batch(x_test))
                 best_au_prc, best_recall, best_precision, best_au_roc, best_fpr, best_tpr, best_accuracy, best_f_measure \
                     = compute_metrics(y_predicted, y_test, args.threshold)
                 save_model(args, discriminator)
