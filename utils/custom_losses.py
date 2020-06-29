@@ -11,7 +11,7 @@ def fence_loss(g_out, beta, power):
         distance_xy = tf.pow(tf.abs(tf.subtract(g_out, center)), power)
         distance = tf.reduce_sum(distance_xy, 1)
         avg_distance = tf.reduce_mean(tf.pow(tf.abs(distance), 1/power))
-        loss_d = tf.reciprocal(avg_distance)
+        loss_d = tf.math.reciprocal(avg_distance)
         
         loss = loss_b + beta*loss_d
         return loss
