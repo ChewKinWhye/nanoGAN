@@ -115,8 +115,11 @@ def load_model(args):
     G.summary()
     # Building Discriminator
     D = Sequential()
-    D.add(Reshape((428, 1), input_shape=(428,)))
-    D.add(LSTM(4))
+    D.add(Reshape((428,1), input_shape=(428,)))
+    D.add(LSTM(20))
+    D.add(Dense(50))
+    D.add(LeakyReLU(alpha=0.2))
+    D.add(BatchNormalization(momentum=0.8))
     D.add(Dense(4, activation='relu'))
     D.add(Dense(1, activation='sigmoid'))
     d_opt = Adam(lr=args.d_lr, beta_1=0.5, beta_2=0.999)
