@@ -27,8 +27,8 @@ def D_data(n_samples, G, mode, x_train, latent_dim):
 
 
 def load_data(args):
-    train_size = int(args.data_size * 0.8)
-    test_size = int(args.data_size * 0.1)
+    train_size = int(args.data_size * 0.1)
+    test_size = int(args.data_size * 0.8)
     val_size = int(args.data_size * 0.1)
 
     modification_ratio = 0.1
@@ -38,11 +38,11 @@ def load_data(args):
     file_path_modified = os.path.join(args.data_path, "msssi.tsv")
 
     test_from_non_modified = int(test_size * (1 - modification_ratio))
-    val_from_non_modified = int(val_size * (1 - modification_ratio))
+    val_from_non_modified = int(val_size * (1 - 0.5))
     total_from_non_modified = int(test_from_non_modified + val_from_non_modified + train_size)
 
     test_from_modified = int(test_size * modification_ratio)
-    val_from_modified = int(val_size * modification_ratio)
+    val_from_modified = int(val_size * 0.5)
     total_from_modified = test_from_modified + val_from_modified
 
     # Extract data from non-modified

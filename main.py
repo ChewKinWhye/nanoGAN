@@ -6,6 +6,7 @@ from utils.save import save_results
 
 import numpy as np
 import tensorflow as tf
+
 args = parse_args()
 
 np.random.seed(args.seed)
