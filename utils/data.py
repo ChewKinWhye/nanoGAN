@@ -103,6 +103,8 @@ def load_data(args):
     val_data.extend(non_modified_data[train_size + test_from_non_modified:])
     val_data = np.asarray(val_data)
     val_data_labels = np.append(np.ones(val_from_modified), np.zeros(val_from_non_modified))
+    val_data_labels.astype(int)
+    test_data_labels.astype(int)
     print(f"Train data shape: {train_data.shape}")
     print(f"Test data shape: {test_data.shape}")
     print(f"Test data labels shape: {test_data_labels.shape}")

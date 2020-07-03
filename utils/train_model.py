@@ -5,7 +5,7 @@ from utils.model import K, gamma, set_trainability
 from utils.evaluate import compute_metrics
 from utils.data import D_data, noise_data
 from utils.save import save_model
-import time
+
 
 def pre_train(args, generator, discriminator, x_train):
     # Pre-train discriminator, Generator is not trained
