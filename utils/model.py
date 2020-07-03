@@ -142,6 +142,6 @@ def load_deep_signal_supervised(args):
     d_out = Dense(1, activation='sigmoid')(x)
     d_opt = Adam(lr=0.001, beta_1=0.5, beta_2=0.999)
     D = Model(d_in, d_out)
-    D.compile(loss=d_loss, optimizer=d_opt)
+    D.compile(loss=d_loss, optimizer=d_opt, metrics=['accuracy'])
     D.summary()
     return D

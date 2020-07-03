@@ -17,9 +17,9 @@ x_train, x_test, y_test, x_val, y_val = load_data(args)
 weights = {0: 1,
            1: 9}
 model = load_deep_signal_supervised(args)
-model.fit(x_test, y_test, epochs=1, batch_size=128, class_weight=weights)
-
+model.fit(x_test, y_test, epochs=100, batch_size=512, class_weight=weights)
 y_predicted = np.squeeze(model.predict_on_batch(x_val))
 results = (compute_metrics(y_predicted, y_val, args.threshold))
-
+print(f"AU-PRC: {results[0]}")
+print(f"AU-ROC: {results[3]}")
 save_results(args, results, y_val)
