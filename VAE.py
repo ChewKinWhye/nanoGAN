@@ -9,6 +9,7 @@ from utils.data import load_data
 from utils.arguments import parse_args
 from utils.evaluate import compute_metrics, plot_prc
 from sklearn.metrics import auc, precision_recall_curve, roc_curve, f1_score, accuracy_score
+from sklearn.utils import class_weight
 
 class Sampling(layers.Layer):
     """Uses (z_mean, z_log_var) to sample z, the vector encoding a digit."""
@@ -20,7 +21,7 @@ class Sampling(layers.Layer):
         epsilon = tf.keras.backend.random_normal(shape=(batch, dim))
         return z_mean + tf.exp(0.5 * z_log_var) * epsilon
 
-latent_dim = 2
+latent_dim = 20
 
 encoder_inputs = keras.Input(shape=(428,))
 x = layers.Dense(256, activation="relu")(encoder_inputs)
@@ -91,20 +92,28 @@ normalized_x_val = preprocessing.normalize(x_val)
 
 vae = VAE(encoder, decoder)
 vae.compile(optimizer=keras.optimizers.Adam())
-vae.fit(normalized_x_test, epochs=30, batch_size=128)
+vae.fit(normalized_x_test, epochs=100, batch_size=128)
 plot_label_clusters(encoder, decoder, normalized_x_test, y_test)
 
 
-predictor_input = keras.Input(shape=(2,))
+predictor_input = keras.Input(shape=(latent_dim,))
 x = layers.Dense(8, activation="relu")(predictor_input)
 x = layers.Dense(16, activation="relu")(x)
 x = layers.Dense(32, activation="relu")(x)
 predictor_output = layers.Dense(1, activation="relu")(x)
 predictor = keras.Model(predictor_input, predictor_output, name="predictor")
+
+# weights = class_weight.compute_class_weight('balanced',
+#                                             np.unique(y_val),
+#                                             y_val)
+
+w = {0: 1.,
+     1: 9.}
+
 predictor.compile(loss=keras.losses.binary_crossentropy, optimizer=keras.optimizers.Adam())
 
 x_train_predictor = encoder.predict(normalized_x_val)
-predictor.fit(x_train_predictor, y_val, epochs=30, batch_size=128)
+predictor.fit(x_train_predictor, y_val, epochs=100, batch_size=128, class_weight=w)
 
 # Test model
 enc_out = encoder.predict(normalized_x_val)

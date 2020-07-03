@@ -38,11 +38,11 @@ def load_data(args):
     file_path_modified = os.path.join(args.data_path, "msssi.tsv")
 
     test_from_non_modified = int(test_size * (1 - modification_ratio))
-    val_from_non_modified = int(val_size * (1 - 0.5))
+    val_from_non_modified = int(val_size * (1 - modification_ratio))
     total_from_non_modified = int(test_from_non_modified + val_from_non_modified + train_size)
 
     test_from_modified = int(test_size * modification_ratio)
-    val_from_modified = int(val_size * 0.5)
+    val_from_modified = int(val_size * modification_ratio)
     total_from_modified = test_from_modified + val_from_modified
 
     # Extract data from non-modified
