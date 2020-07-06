@@ -50,11 +50,11 @@ def train(args, generator, discriminator, GAN, x_train, x_test, y_test, x_val, y
                     loss_temp = []
                     set_trainability(discriminator, True)
                     K.set_value(gamma, [1])
-                    x, y = D_data(batch_size, generator, 'normal', x_train, latent_dim)
+                    x, y = D_data(int(batch_size/2), generator, 'normal', x_train, latent_dim)
                     loss_temp.append(discriminator.train_on_batch(x, y))
                     set_trainability(discriminator, True)
                     K.set_value(gamma, [args.gamma])
-                    x, y = D_data(batch_size, generator, 'gen', x_train, latent_dim)
+                    x, y = D_data(int(batch_size), generator, 'gen', x_train, latent_dim)
                     loss_temp.append(discriminator.train_on_batch(x, y))
                     d_loss.append(sum(loss_temp)/len(loss_temp))
                     
