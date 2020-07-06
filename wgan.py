@@ -199,7 +199,7 @@ def train(g_model, c_model, gan_model, dataset, latent_dim, n_epochs=10, n_batch
         print('>%d, c1=%.8f, c2=%.8f g=%.8f' % (i + 1, c1_hist[-1], c2_hist[-1], g_loss))
         # evaluate the model performance every 'epoch'
         if (i + 1) % bat_per_epo == 0:
-            y_predicted = (np.squeeze(c_model.predict_on_batch(x_val)) + 1) / 2
+            y_predicted = 1 - (np.squeeze(c_model.predict_on_batch(x_val)) + 1) / 2
             au_prc_val, _, _, au_roc_val, _, _, accuracy_val, f_measure_val = \
                 compute_metrics(y_predicted, y_val, args.threshold)
             print(f"\tAu-roc: {au_roc_val:.3f}")
