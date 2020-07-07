@@ -33,8 +33,8 @@ def load_deep_signal_model(args):
 
     top_module = Lambda(lambda x: x[:, 0:50])(ffnn_out)
     x = Reshape((50, 1))(top_module)
-    x = Bidirectional(LSTM(8, return_sequences=True))(x)
-    top_out = LSTM(68)(x)
+    x = Bidirectional(LSTM(8))(x)
+    top_out = Dense(68)(x)
 
     bottom_module = Lambda(lambda x: x[:, 50:])(ffnn_out)
     x = Reshape((1, 50, 1))(bottom_module)
