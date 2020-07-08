@@ -103,9 +103,6 @@ x = layers.Dense(32, activation="relu")(x)
 predictor_output = layers.Dense(1, activation="relu")(x)
 predictor = keras.Model(predictor_input, predictor_output, name="predictor")
 
-# weights = class_weight.compute_class_weight('balanced',
-#                                             np.unique(y_val),
-#                                             y_val)
 
 w = {0: 1.,
      1: 9.}
