@@ -11,7 +11,7 @@ def parse_args():
     parser.add_argument('--gamma', type=float, default=0.1, help='gamma')
     parser.add_argument('--alpha', type=float, default=0.5, help='alpha')
     parser.add_argument('--threshold', type=float, default=0.5, help='threshold')
-
+    parser.add_argument('--wgan', type=bool, default=True, help='Set True to use wgan')
     # Other hyper-parameters
     parser.add_argument('--epochs', type=int, default=50, help='number of epochs to train')
     parser.add_argument('--batch_size', type=int, default=512, help='')
