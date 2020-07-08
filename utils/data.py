@@ -27,11 +27,11 @@ def D_data(n_samples, G, mode, x_train, latent_dim):
 
 
 def load_data(args):
-    train_size = int(args.data_size * 0.1)
-    test_size = int(args.data_size * 0.8)
+    train_size = int(args.data_size * 0.8)
+    test_size = int(args.data_size * 0.1)
     val_size = int(args.data_size * 0.1)
 
-    modification_ratio = 0.1
+    modification_ratio = 0.5
     dna_lookup = {"A": 0, "T": 1, "G": 2, "C": 3}
     # Global parameters
     file_path_normal = os.path.join(args.data_path, "pcr.tsv")

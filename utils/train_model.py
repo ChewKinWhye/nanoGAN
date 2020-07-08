@@ -2,7 +2,7 @@ import numpy as np
 from tqdm import trange
 
 from utils.model import K, gamma, set_trainability
-from utils.evaluate import compute_metrics
+from utils.evaluate import compute_metrics, compute_metrics_standardized
 from utils.data import D_data, noise_data
 from utils.save import save_model
 
@@ -72,26 +72,27 @@ def train(args, generator, discriminator, GAN, x_train, x_test, y_test, x_val, y
         if (epoch + 1) % v_freq == 0:
             # Check for the best validation results
             y_predicted = 1 - np.squeeze(discriminator.predict_on_batch(x_val))
-            au_prc_val, _, _, au_roc_val, _, _, accuracy_val, f_measure_val = \
-                compute_metrics(y_predicted, y_val, args.threshold)
+            accuracy_val, sensitivity_val, specificity_val, precision_val, au_roc_val = compute_metrics_standardized(y_predicted, y_val)
 
             if au_roc_val > best_au_roc_val:
                 best_au_roc_val = au_roc_val
                 # Save the best test results
                 y_predicted = 1 - np.squeeze(discriminator.predict_on_batch(x_test))
-                best_au_prc, best_recall, best_precision, best_au_roc, best_fpr, best_tpr, best_accuracy, best_f_measure \
-                    = compute_metrics(y_predicted, y_test, args.threshold)
+                best_accuracy, best_sensitivity, best_specificity, best_precision, best_au_roc = compute_metrics_standardized(y_predicted, y_test)
                 save_model(args, discriminator)
                 
-            print(f"\tGen. Loss: {g_loss[-1]:.3f}\n\tDisc. Loss: {d_loss[-1]:.3f}\n\tAu-roc: {au_roc_val:.3f}")
-            print(f"\tAu-prc: {au_prc_val:.3f}\n\tAccuracy: {accuracy_val:.3f}\n\tF-Measure: {f_measure_val:.3f}")
-        else:
-            print(f"\tGen. Loss: {g_loss[-1]:.3f}\n\tDisc. Loss: {d_loss[-1]:.3f}")
+            print(f"\tAccuracy    : {accuracy_val:.3f}")
+            print(f"\tSensitivity : {sensitivity_val:.3f}")
+            print(f"\tSpecificity : {specificity_val:.3f}")
+            print(f"\tPrecision   : {precision_val:.3f}")
+            print(f"\tAUC         : {au_roc_val:.3f}")
+        print(f"\tGen. Loss: {g_loss[-1]:.3f}\n\tDisc. Loss: {d_loss[-1]:.3f}")
 
     print('===== End of Adversarial Training =====')
-    print(f'Best test au_prc: {round(best_au_prc, 3)}\nBest test au_roc: {round(best_au_roc, 3)}')
-    print(f'Best test accuracy: {round(best_accuracy, 3)}\nBest test f-measure: {round(best_f_measure, 3)}')
-
-    results = (best_au_prc, best_recall, best_precision, best_au_roc, best_fpr, best_tpr, best_accuracy, best_f_measure)
-
+    print(f"\tBest accuracy    : {best_accuracy:.3f}")
+    print(f"\tBest sensitivity : {best_sensitivity:.3f}")
+    print(f"\tBest specificity : {best_specificity:.3f}")
+    print(f"\tBest precision   : {best_precision:.3f}")
+    print(f"\tBest AUC         : {best_au_roc:.3f}") 
+    results = (best_accuracy, best_sensitivity, best_specificity, best_precision, best_au_roc)
     return results

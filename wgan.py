@@ -204,6 +204,10 @@ def train(g_model, c_model, gan_model, dataset, latent_dim, n_epochs=10, n_batch
                 compute_metrics(y_predicted, y_val, args.threshold)
             print(f"\tAu-roc: {au_roc_val:.3f}")
             print(f"\tAu-prc: {au_prc_val:.3f}\n\tAccuracy: {accuracy_val:.3f}\n\tF-Measure: {f_measure_val:.3f}")
+            au_prc_val, _, _, au_roc_val, _, _, accuracy_val, f_measure_val =  \
+                    compute_metrics(1-y_predicted, y_val, args.threshold)
+            print(f"\tAu-roc: {au_roc_val:.3f}")
+            print(f"\tAu-prc: {au_prc_val:.3f}\n\tAccuracy: {accuracy_val:.3f}\n\tF-Measure: {f_measure_val:.3f}") 
     # line plots of loss
     plot_history(c1_hist, c2_hist, g_hist)
 
