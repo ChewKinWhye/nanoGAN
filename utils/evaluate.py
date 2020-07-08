@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.metrics import auc, precision_recall_curve, roc_curve, f1_score, accuracy_score
+from sklearn.metrics import auc, precision_recall_curve, roc_curve, f1_score, accuracy_score, recall_score, precision_score
 
 
 def compute_metrics(y_predicted, y_test, threshold):
@@ -15,6 +15,24 @@ def compute_metrics(y_predicted, y_test, threshold):
     f_measure = f1_score(y_test, y_predicted_binary, average='macro')
 
     return au_prc, recall, precision, au_roc, fpr, tpr, accuracy, f_measure
+
+
+def compute_metrics_standardized(y_predicted, y_test):
+    fpr, tpr, thresholds = roc_curve(y_test, y_predicted)
+    au_roc = auc(fpr, tpr)
+
+    optimal_idx = np.argmax(tpr - fpr)
+    optimal_threshold = thresholds[optimal_idx]
+    
+    y_predicted_binary = [0 if i < optimal_threshold else 1 for i in y_predicted]
+    
+    accuracy = accuracy_score(y_test, y_predicted_binary)
+    sensitivity = recall_score(y_test, y_predicted_binary)
+    # Lazy to calculate
+    specificity = -1
+    precision = precision_score(y_test, y_predicted_binary)
+    
+    return accuracy, sensitivity, specificity, precision, au_roc
 
 
 def plot_prc(results, y_test, threshold):

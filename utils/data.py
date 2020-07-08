@@ -31,7 +31,7 @@ def load_data(args):
     test_size = int(args.data_size * 0.1)
     val_size = int(args.data_size * 0.1)
 
-    modification_ratio = 0.1
+    modification_ratio = 0.5
     dna_lookup = {"A": 0, "T": 1, "G": 2, "C": 3}
     # Global parameters
     file_path_normal = os.path.join(args.data_path, "pcr.tsv")
@@ -103,6 +103,8 @@ def load_data(args):
     val_data.extend(non_modified_data[train_size + test_from_non_modified:])
     val_data = np.asarray(val_data)
     val_data_labels = np.append(np.ones(val_from_modified), np.zeros(val_from_non_modified))
+    val_data_labels.astype(int)
+    test_data_labels.astype(int)
     print(f"Train data shape: {train_data.shape}")
     print(f"Test data shape: {test_data.shape}")
     print(f"Test data labels shape: {test_data_labels.shape}")

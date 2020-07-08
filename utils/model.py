@@ -28,6 +28,7 @@ def d_loss(y_true, y_predicted):
 def load_deep_signal_model(args):
     # Building Generator
     g_in = Input(shape=(args.latent_dim,))
+    
     x = Dense(128, activation='relu')(g_in)
     ffnn_out = Dense(100, activation='relu')(x)
 
@@ -117,3 +118,31 @@ def load_model(args):
     gan.summary()
 
     return G, D, gan
+
+
+def load_deep_signal_supervised(args):
+    # Building Discriminator
+    d_in = Input(shape=(428,))
+    # Top module to process 4*17 features using LSTM
+    top_module = Lambda(lambda x: x[:, 0:-360])(d_in)
+    x = Reshape((68, 1))(top_module)
+    x = Bidirectional(LSTM(50))(x)
+    x = Reshape((100, 1))(x)
+    top_out = Bidirectional(LSTM(50))(x)
+    # Bottom model to process 360 signals using CNN
+    bottom_module = Lambda(lambda x: x[:, -360:])(d_in)
+    x = Reshape((1, 360, 1))(bottom_module)
+    x = Conv2D(filters=32, kernel_size=(1, 7), strides=2)(x)
+    # Add in inception layers
+    x = AveragePooling2D(pool_size=(1, 7), strides=5)(x)
+    x = AveragePooling2D(pool_size=(1, 5), strides=3)(x)
+    bottom_out = Reshape((-1,))(x)
+    # Classification module which combines top and bottom outputs using FFNN
+    classification_in = Concatenate(axis=1)([top_out, bottom_out])
+    x = Dense(32, activation='relu')(classification_in)
+    d_out = Dense(1, activation='sigmoid')(x)
+    d_opt = Adam(lr=0.001, beta_1=0.5, beta_2=0.999)
+    D = Model(d_in, d_out)
+    D.compile(loss=d_loss, optimizer=d_opt, metrics=['accuracy'])
+    D.summary()
+    return D

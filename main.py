@@ -6,6 +6,7 @@ from utils.save import save_results
 
 import numpy as np
 import tensorflow as tf
+
 args = parse_args()
 
 np.random.seed(args.seed)
@@ -15,4 +16,4 @@ x_train, x_test, y_test, x_val, y_val = load_data(args)
 generator, discriminator, GAN = load_deep_signal_model(args)
 pre_train(args, generator, discriminator, x_train)
 results = train(args, generator, discriminator, GAN, x_train, x_test, y_test, x_val, y_val)
-save_results(args, results, y_test)
+# save_results(args, results, y_test)
