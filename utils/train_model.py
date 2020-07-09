@@ -72,13 +72,13 @@ def train(args, generator, discriminator, GAN, x_train, x_test, y_test, x_val, y
         if (epoch + 1) % v_freq == 0:
             # Check for the best validation results
             y_predicted = 1 - np.squeeze(discriminator.predict_on_batch(x_val))
-            accuracy_val, sensitivity_val, specificity_val, precision_val, au_roc_val = compute_metrics_standardized(y_predicted, y_val)
+            accuracy_val, sensitivity_val, specificity_val, precision_val, au_roc_val, cm_val = compute_metrics_standardized(y_predicted, y_val)
 
             if au_roc_val > best_au_roc_val:
                 best_au_roc_val = au_roc_val
                 # Save the best test results
                 y_predicted = 1 - np.squeeze(discriminator.predict_on_batch(x_test))
-                best_accuracy, best_sensitivity, best_specificity, best_precision, best_au_roc = compute_metrics_standardized(y_predicted, y_test)
+                best_accuracy, best_sensitivity, best_specificity, best_precision, best_au_roc, best_cm = compute_metrics_standardized(y_predicted, y_test)
                 save_model(args, discriminator)
                 
             print(f"\tAccuracy    : {accuracy_val:.3f}")
@@ -86,6 +86,7 @@ def train(args, generator, discriminator, GAN, x_train, x_test, y_test, x_val, y
             print(f"\tSpecificity : {specificity_val:.3f}")
             print(f"\tPrecision   : {precision_val:.3f}")
             print(f"\tAUC         : {au_roc_val:.3f}")
+            print(f"{cm_val}")
         print(f"\tGen. Loss: {g_loss[-1]:.3f}\n\tDisc. Loss: {d_loss[-1]:.3f}")
 
     print('===== End of Adversarial Training =====')
@@ -94,5 +95,6 @@ def train(args, generator, discriminator, GAN, x_train, x_test, y_test, x_val, y
     print(f"\tBest specificity : {best_specificity:.3f}")
     print(f"\tBest precision   : {best_precision:.3f}")
     print(f"\tBest AUC         : {best_au_roc:.3f}") 
+    print(f"{best_cm}")
     results = (best_accuracy, best_sensitivity, best_specificity, best_precision, best_au_roc)
     return results

@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.metrics import auc, precision_recall_curve, roc_curve, f1_score, accuracy_score, recall_score, precision_score
+from sklearn.metrics import auc, precision_recall_curve, confusion_matrix, roc_curve, f1_score, accuracy_score, recall_score, precision_score
 
 
 def compute_metrics(y_predicted, y_test, threshold):
@@ -31,8 +31,9 @@ def compute_metrics_standardized(y_predicted, y_test):
     # Lazy to calculate
     specificity = -1
     precision = precision_score(y_test, y_predicted_binary)
-    
-    return accuracy, sensitivity, specificity, precision, au_roc
+    cm = confusion_matrix(y_test, y_predicted_binary)
+
+    return accuracy, sensitivity, specificity, precision, au_roc, cm
 
 
 def plot_prc(results, y_test, threshold):
