@@ -37,9 +37,8 @@ def train(args, generator, discriminator, GAN, x_train, x_test, y_test, x_val, y
     v_freq = args.v_freq
     latent_dim = args.latent_dim
 
-    d_loss, g_loss = [], []
-    au_prc_val, best_au_roc_val, best_au_prc, best_recall, best_precision, best_au_roc, best_fpr, best_tpr, best_accuracy, best_f_measure \
-        = 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    d_loss, g_loss, best_cm = [], [], []
+    best_au_roc_val, best_accuracy, best_sensitivity, best_specificity, best_precision, best_au_roc = 0, 0, 0, 0, 0, 0
 
     print('===== Start of Adversarial Training =====')
     for epoch in range(epochs):
@@ -61,7 +60,7 @@ def train(args, generator, discriminator, GAN, x_train, x_test, y_test, x_val, y
                     # Train Generator
                     set_trainability(discriminator, False)
                     x = noise_data(batch_size, latent_dim)
-                    y = np.zeros(batch_size)
+                    y = np.ones(batch_size)
                     y[:] = args.alpha
                     g_loss.append(GAN.train_on_batch(x, y))
                     t.set_postfix(G_loss=g_loss[-1], D_loss=d_loss[-1])

@@ -8,22 +8,18 @@ from keras.datasets.mnist import load_data
 from keras import backend
 from keras.optimizers import RMSprop
 from keras.models import Sequential
-from keras.layers import Dense
-from keras.layers import Reshape
-from keras.layers import Flatten
-from keras.layers import Conv2D
-from keras.layers import Conv2DTranspose
-from keras.layers import LeakyReLU
-from keras.layers import BatchNormalization
 from keras.initializers import RandomNormal
 from keras.constraints import Constraint
 from matplotlib import pyplot
 from utils.arguments import parse_args
 from utils.data import load_data
 from keras.layers import Reshape, LeakyReLU, Input, Dense, BatchNormalization, LSTM
-from utils.evaluate import compute_metrics
+from utils.evaluate import compute_metrics_standardized
 import numpy as np
-
+from keras.models import Model, Sequential
+from keras.layers import Reshape, LeakyReLU, Input, Dense, BatchNormalization, LSTM,\
+    Layer, Lambda, Permute, Flatten, add, Bidirectional, Concatenate, Conv1D, Conv2D,\
+    MaxPooling1D, MaxPooling2D, AveragePooling2D
 
 def set_trainability(model, trainable=False):
     # Alternate to freeze D network while training only G in (G+D) combination
@@ -53,19 +49,27 @@ def wasserstein_loss(y_true, y_pred):
 
 
 # define the standalone critic model
-def define_critic(in_shape=(28, 28, 1)):
-    # weight initialization
-    init = RandomNormal(stddev=0.02)
-    # weight constraint
-    const = ClipConstraint(0.01)
-    D = Sequential()
-    D.add(Reshape((428,1), input_shape=(428,)))
-    D.add(LSTM(20, kernel_initializer=init, kernel_constraint=const))
-    D.add(Dense(50, kernel_initializer=init, kernel_constraint=const))
-    D.add(LeakyReLU(alpha=0.2))
-    D.add(BatchNormalization(momentum=0.8))
-    D.add(Dense(4, activation='relu', kernel_initializer=init, kernel_constraint=const))
-    D.add(Dense(1))
+def define_critic():
+    d_in = Input(shape=(428,))
+    # Top module to process 4*17 features using LSTM
+    top_module = Lambda(lambda x: x[:, 0:-360])(d_in)
+    x = Reshape((68, 1))(top_module)
+    x = Bidirectional(LSTM(50))(x)
+    x = Reshape((100, 1))(x)
+    top_out = Bidirectional(LSTM(50))(x)
+    # Bottom model to process 360 signals using CNN
+    bottom_module = Lambda(lambda x: x[:, -360:])(d_in)
+    x = Reshape((1, 360, 1))(bottom_module)
+    x = Conv2D(filters=32, kernel_size=(1, 7), strides=2)(x)
+    # Add in inception layers
+    x = AveragePooling2D(pool_size=(1, 7), strides=5)(x)
+    x = AveragePooling2D(pool_size=(1, 5), strides=3)(x)
+    bottom_out = Reshape((-1,))(x)
+    # Classification module which combines top and bottom outputs using FFNN
+    classification_in = Concatenate(axis=1)([top_out, bottom_out])
+    x = Dense(32, activation='relu')(classification_in)
+    d_out = Dense(1)(x)
+    D = Model(d_in, d_out)
     opt = RMSprop(lr=0.00005)
     D.compile(loss=wasserstein_loss, optimizer=opt)
     D.summary()
@@ -73,16 +77,27 @@ def define_critic(in_shape=(28, 28, 1)):
 
 
 # define the standalone generator model
-def define_generator(latent_dim):
+def define_generator():
     # weight initialization
-    init = RandomNormal(stddev=0.02)
-    G = Sequential()
-    G.add(Dense(args.latent_dim, kernel_initializer=init, input_dim=args.latent_dim))
-    G.add(LeakyReLU(alpha=0.2))
-    G.add(BatchNormalization(momentum=0.8))
-    G.add(Reshape((args.latent_dim, 1)))
-    G.add(LSTM(4))
-    G.add(Dense(428))
+    g_in = Input(shape=(args.latent_dim,))
+
+    x = Dense(128, activation='relu')(g_in)
+    ffnn_out = Dense(100, activation='relu')(x)
+
+    top_module = Lambda(lambda x: x[:, 0:50])(ffnn_out)
+    x = Reshape((50, 1))(top_module)
+    x = Bidirectional(LSTM(8))(x)
+    top_out = Dense(68)(x)
+
+    bottom_module = Lambda(lambda x: x[:, 50:])(ffnn_out)
+    x = Reshape((1, 50, 1))(bottom_module)
+    x = Conv2D(filters=32, kernel_size=(1, 7), strides=1)(x)
+    x = AveragePooling2D(pool_size=(1, 7), strides=5)(x)
+    x = AveragePooling2D(pool_size=(1, 5), strides=3)(x)
+    x = Reshape((-1,))(x)
+    bottom_out = Dense(360)(x)
+    g_out = Concatenate(axis=1)([top_out, bottom_out])
+    G = Model(g_in, g_out)
     G.summary()
     return G
 
@@ -169,7 +184,10 @@ def train(g_model, c_model, gan_model, dataset, latent_dim, n_epochs=10, n_batch
     # calculate the size of half a batch of samples
     half_batch = int(n_batch / 2)
     # lists for keeping track of loss
-    c1_hist, c2_hist, g_hist = list(), list(), list()
+    c1_hist, c2_hist, g_hist = [], [],  []
+    best_cm = []
+    best_au_roc_val, best_accuracy, best_sensitivity, best_specificity, best_precision, best_au_roc = 0, 0, 0, 0, 0, 0
+
     # manually enumerate epochs
     for i in range(n_steps):
         # update the critic more than the generator
@@ -200,14 +218,26 @@ def train(g_model, c_model, gan_model, dataset, latent_dim, n_epochs=10, n_batch
         # evaluate the model performance every 'epoch'
         if (i + 1) % bat_per_epo == 0:
             y_predicted = 1 - (np.squeeze(c_model.predict_on_batch(x_val)) + 1) / 2
-            au_prc_val, _, _, au_roc_val, _, _, accuracy_val, f_measure_val = \
-                compute_metrics(y_predicted, y_val, args.threshold)
-            print(f"\tAu-roc: {au_roc_val:.3f}")
-            print(f"\tAu-prc: {au_prc_val:.3f}\n\tAccuracy: {accuracy_val:.3f}\n\tF-Measure: {f_measure_val:.3f}")
-            au_prc_val, _, _, au_roc_val, _, _, accuracy_val, f_measure_val =  \
-                    compute_metrics(1-y_predicted, y_val, args.threshold)
-            print(f"\tAu-roc: {au_roc_val:.3f}")
-            print(f"\tAu-prc: {au_prc_val:.3f}\n\tAccuracy: {accuracy_val:.3f}\n\tF-Measure: {f_measure_val:.3f}") 
+            accuracy_val, sensitivity_val, specificity_val, precision_val, au_roc_val, cm_val = compute_metrics_standardized(y_predicted, y_val)
+            if au_roc_val > best_au_roc_val:
+                best_au_roc_val = au_roc_val
+                # Save the best test results
+                y_predicted = 1 - np.squeeze(c_model.predict_on_batch(x_test))
+                best_accuracy, best_sensitivity, best_specificity, best_precision, best_au_roc, best_cm = compute_metrics_standardized(y_predicted, y_test)
+            print(f"\tAccuracy    : {accuracy_val:.3f}")
+            print(f"\tSensitivity : {sensitivity_val:.3f}")
+            print(f"\tSpecificity : {specificity_val:.3f}")
+            print(f"\tPrecision   : {precision_val:.3f}")
+            print(f"\tAUC         : {au_roc_val:.3f}")
+            print(f"{cm_val}")
+
+    print('===== End of Adversarial Training =====')
+    print(f"\tBest accuracy    : {best_accuracy:.3f}")
+    print(f"\tBest sensitivity : {best_sensitivity:.3f}")
+    print(f"\tBest specificity : {best_specificity:.3f}")
+    print(f"\tBest precision   : {best_precision:.3f}")
+    print(f"\tBest AUC         : {best_au_roc:.3f}")
+    print(f"{best_cm}")
     # line plots of loss
     plot_history(c1_hist, c2_hist, g_hist)
 
@@ -217,7 +247,7 @@ latent_dim = args.latent_dim
 # create the critic
 critic = define_critic()
 # create the generator
-generator = define_generator(latent_dim)
+generator = define_generator()
 # create the gan
 gan_model = define_gan(generator, critic)
 # load image data
