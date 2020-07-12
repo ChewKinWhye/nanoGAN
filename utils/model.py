@@ -29,7 +29,7 @@ def load_deep_signal_model(args):
     # Building Generator
     g_in = Input(shape=(args.latent_dim,))
     
-    x = Dense(128, activation='relu')(g_in)
+    x = Dense(64, activation='relu')(g_in)
     ffnn_out = Dense(100, activation='relu')(x)
 
     top_module = Lambda(lambda x: x[:, 0:50])(ffnn_out)

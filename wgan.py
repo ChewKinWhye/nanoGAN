@@ -254,4 +254,4 @@ gan_model = define_gan(generator, critic)
 x_train, x_test, y_test, x_val, y_val = load_data(args)
 print(x_train.shape)
 # train model
-train(generator, critic, gan_model, x_train, latent_dim)
+train(generator, critic, gan_model, x_train, latent_dim, n_epochs=args.epochs)
