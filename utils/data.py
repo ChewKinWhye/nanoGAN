@@ -2,7 +2,7 @@ import numpy as np
 import csv
 import os
 import random
-
+from sklearn import preprocessing
 
 def noise_data(n_samples, latent_dim):
     return np.random.normal(0, 1, [n_samples, latent_dim])
@@ -91,7 +91,11 @@ def load_data(args):
     
     random.shuffle(non_modified_data)
     random.shuffle(modified_data)
-    
+
+    # Normalize data
+    non_modified_data = preprocessing.normalize(non_modified_data)
+    modified_data = preprocessing.normalize(modified_data)
+
     train_data = np.asarray(non_modified_data[0:train_size])
 
     test_data = modified_data[0:test_from_modified]
