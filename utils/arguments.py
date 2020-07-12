@@ -24,6 +24,6 @@ def parse_args():
     parser.add_argument('--latent_dim', type=int, default=100,
                                help='Latent dimension of Gaussian noise input to Generator')
     parser.add_argument('--data_size', type=int, default=100000, help='size of dataset to use')
-
+    parser.add_argument('--label_smoothing', type=bool, default=True, help='To use label smoothing or not')
     args = parser.parse_args()
     return args

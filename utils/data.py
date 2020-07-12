@@ -93,8 +93,8 @@ def load_data(args):
     random.shuffle(modified_data)
 
     # Normalize data
-    non_modified_data = preprocessing.normalize(non_modified_data)
-    modified_data = preprocessing.normalize(modified_data)
+    non_modified_data = list(preprocessing.normalize(np.asarray(non_modified_data)))
+    modified_data = list(preprocessing.normalize(np.asarray(modified_data)))
 
     train_data = np.asarray(non_modified_data[0:train_size])
 
