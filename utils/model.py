@@ -49,11 +49,11 @@ def load_dc_gan_model(args):
     generator.add(BatchNormalization())
     generator.add(LeakyReLU())
     generator.add(Flatten())
-    generator.add(Dense(428, activation='tanh'))
+    generator.add(Dense(479, activation='sigmoid'))
     generator.summary()
 
     discriminator = Sequential()
-    discriminator.add(Dense(28 * 28, use_bias=False, input_shape=(428,)))
+    discriminator.add(Dense(28 * 28, use_bias=False, input_shape=(479,)))
     discriminator.add(Reshape((28, 28, 1)))
     discriminator.add(Conv2D(64, (5, 5), strides=(2, 2), padding='same'))
     discriminator.add(LeakyReLU())

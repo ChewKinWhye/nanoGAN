@@ -71,6 +71,8 @@ def train(args, generator, discriminator, GAN, x_train, x_test, y_test, x_val, y
         if (epoch + 1) % v_freq == 0:
             # Check for the best validation results
             y_predicted = 1 - np.squeeze(discriminator.predict_on_batch(x_val))
+            x = noise_data(batch_size, latent_dim)
+            print(generator.predict_on_batch(x)[0:5, 24:44])
             accuracy_val, sensitivity_val, specificity_val, precision_val, au_roc_val, cm_val = compute_metrics_standardized(y_predicted, y_val)
 
             if au_roc_val > best_au_roc_val:

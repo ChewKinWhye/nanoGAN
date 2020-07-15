@@ -32,7 +32,7 @@ def load_data(args):
     val_size = int(args.data_size * 0.1)
 
     modification_ratio = 0.5
-    dna_lookup = {"A": 0, "T": 1, "G": 2, "C": 3}
+    dna_lookup = {"A": [0, 0, 0, 1], "T": [0, 0, 1, 0], "G": [0, 1, 0, 0], "C": [1, 0, 0, 0]}
     # Global parameters
     file_path_normal = os.path.join(args.data_path, "pcr.tsv")
     file_path_modified = os.path.join(args.data_path, "msssi.tsv")
@@ -54,14 +54,18 @@ def load_data(args):
             if data_count == total_from_non_modified:
                 break
             # The second last row contains the 360 signal values, separated by commas
-            row_data = [dna_lookup[i] for i in row[6]]
+            if row[6][6:11] != 'CGCGC':
+                continue
+            row_data = []
+            for i in row[6]:
+                row_data.extend(dna_lookup[i])
             row_data.extend(row[7].split(","))
             row_data.extend(row[8].split(","))
             row_data.extend(row[9].split(","))
             row_data.extend(row[10].split(","))
             row_data_float = [float(i) for i in row_data]
             # Check for data inconsistencies, and to only use the template strand
-            if row[5].lower() == 'c' or len(row_data) != 428 or row[-1] != "0":
+            if row[5].lower() == 'c' or len(row_data) != 479 or row[-1] != "0":
                 continue
             # The last row represents the methylation state. We only want to train the model on unmethylated datapoints
             non_modified_data.append(row_data_float)
@@ -76,14 +80,18 @@ def load_data(args):
             if data_count == total_from_modified:
                 break
             # The second last row contains the 360 signal values, separated by commas
-            row_data = [dna_lookup[i] for i in row[6]]
+            if row[6][6:11] != 'CGCGC':
+                continue
+            row_data = []
+            for i in row[6]:
+                row_data.extend(dna_lookup[i])
             row_data.extend(row[7].split(","))
             row_data.extend(row[8].split(","))
             row_data.extend(row[9].split(","))
             row_data.extend(row[10].split(","))
             row_data_float = [float(i) for i in row_data]
             # Check for data inconsistencies, and to only use the template strand
-            if row[5].lower() == 'c' or len(row_data) != 428 or row[-1] != "1":
+            if row[5].lower() == 'c' or len(row_data) != 479 or row[-1] != "1":
                 continue
             # The last row represents the methylation state. We only want to train the model on unmethylated datapoints
             modified_data.append(row_data_float)
@@ -93,9 +101,18 @@ def load_data(args):
     random.shuffle(modified_data)
 
     # Normalize data
-    non_modified_data = list(preprocessing.normalize(np.asarray(non_modified_data)))
-    modified_data = list(preprocessing.normalize(np.asarray(modified_data)))
 
+    max_val = max(max(max(non_modified_data)), max(max(modified_data)))
+    min_val = min(min(min(non_modified_data)), min(min(modified_data)))
+    range_val = max_val - min_val
+    non_modified_data = list((np.asarray(non_modified_data) - min_val) / range_val)
+    modified_data = list((np.asarray(modified_data) - min_val) / range_val)
+    print(non_modified_data[0][24:44])
+    print(non_modified_data[1][24:44])
+    print(non_modified_data[2][24:44])
+    print(modified_data[0][24:44])
+    print(modified_data[1][24:44]) 
+    print(modified_data[2][24:44]) 
     train_data = np.asarray(non_modified_data[0:train_size])
 
     test_data = modified_data[0:test_from_modified]
