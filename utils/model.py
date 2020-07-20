@@ -146,11 +146,11 @@ def load_model(args):
     G.add(BatchNormalization(momentum=0.8))
     G.add(Reshape((args.latent_dim, 1)))
     G.add(LSTM(4))
-    G.add(Dense(428, activation='tanh'))
+    G.add(Dense(479, activation='tanh'))
     G.summary()
     # Building Discriminator
     D = Sequential()
-    D.add(Reshape((428,1), input_shape=(428,)))
+    D.add(Reshape((479,1), input_shape=(479,)))
     D.add(LSTM(20))
     D.add(Dense(50))
     D.add(LeakyReLU(alpha=0.2))
@@ -176,10 +176,10 @@ def load_model(args):
 
 def load_deep_signal_supervised(args):
     # Building Discriminator
-    d_in = Input(shape=(428,))
+    d_in = Input(shape=(479,))
     # Top module to process 4*17 features using LSTM
     top_module = Lambda(lambda x: x[:, 0:-360])(d_in)
-    x = Reshape((68, 1))(top_module)
+    x = Reshape((119, 1))(top_module)
     x = Bidirectional(LSTM(50))(x)
     x = Reshape((100, 1))(x)
     top_out = Bidirectional(LSTM(50))(x)
