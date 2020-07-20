@@ -36,6 +36,32 @@ def compute_metrics_standardized(y_predicted, y_test):
     return accuracy, sensitivity, specificity, precision, au_roc, cm
 
 
+def compute_metrics_standardized_confident(y_predicted, y_test):
+    y_predicted_confident = []
+    y_test_confident = []
+    for i in range(len(y_predicted)):
+        # Confident if it predicts very low or very high
+        if y_predicted[i] < 0.45 or y_predicted[i] > 0.55:
+            y_predicted_confident.append(y_predicted[i])
+            y_test_confident.append(y_test[i])
+
+    fpr, tpr, thresholds = roc_curve(y_test_confident, y_predicted_confident)
+    au_roc = auc(fpr, tpr)
+
+    optimal_idx = np.argmax(tpr - fpr)
+    optimal_threshold = thresholds[optimal_idx]
+
+    y_predicted_binary = [0 if i < optimal_threshold else 1 for i in y_predicted_confident]
+
+    accuracy = accuracy_score(y_test_confident, y_predicted_binary)
+    sensitivity = recall_score(y_test_confident, y_predicted_binary)
+    # Lazy to calculate
+    specificity = -1
+    precision = precision_score(y_test_confident, y_predicted_binary)
+    cm = confusion_matrix(y_test_confident, y_predicted_binary)
+
+    return accuracy, sensitivity, specificity, precision, au_roc, cm
+
 def plot_prc(results, y_test, threshold):
     # Plot recall-precision and fpr-tpr curve
     plt.plot(results[1], results[2], 'r-', label="Precision-Recall curve of model")

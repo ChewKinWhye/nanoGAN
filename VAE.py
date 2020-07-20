@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from utils.data import load_data
 from utils.arguments import parse_args
-from utils.evaluate import compute_metrics_standardized
+from utils.evaluate import compute_metrics_standardized, compute_metrics_standardized_confident
 import random
 
 class Sampling(layers.Layer):
@@ -18,7 +18,7 @@ class Sampling(layers.Layer):
         epsilon = tf.keras.backend.random_normal(shape=(batch, dim))
         return z_mean + tf.exp(0.5 * z_log_var) * epsilon
 
-latent_dim = 2
+latent_dim = 10
 
 encoder_inputs = keras.Input(shape=(479,))
 x = layers.Dense(256, activation="relu")(encoder_inputs)
@@ -77,7 +77,6 @@ def plot_label_clusters(encoder, decoder, data, labels):
     # display a 2D plot of the digit classes in the latent space
     filter_indices = random.sample(range(0, data.shape[0]-1), 3000)
     data_sample = np.take(data, filter_indices, axis=0)
-    print(labels[:])
     label_sample = np.take(labels, filter_indices, axis=0)
     z_mean, _, _ = encoder.predict(data_sample)
     plt.figure(figsize=(12, 10))
@@ -125,9 +124,8 @@ print(f"\tPrecision   : {precision_val:.3f}")
 print(f"\tAUC         : {au_roc_val:.3f}")
 print(f"{cm_val}")
 
-pred_out = predictor.predict(x_train)
-accuracy_val, sensitivity_val, specificity_val, precision_val, au_roc_val, cm_val = compute_metrics_standardized(
-            pred_out, y_train)
+accuracy_val, sensitivity_val, specificity_val, precision_val, au_roc_val, cm_val = compute_metrics_standardized_confident(
+    pred_out, y_test)
 
 print(f"\tAccuracy    : {accuracy_val:.3f}")
 print(f"\tSensitivity : {sensitivity_val:.3f}")
@@ -135,4 +133,3 @@ print(f"\tSpecificity : {specificity_val:.3f}")
 print(f"\tPrecision   : {precision_val:.3f}")
 print(f"\tAUC         : {au_roc_val:.3f}")
 print(f"{cm_val}")
-
