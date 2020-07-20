@@ -22,6 +22,8 @@ latent_dim = 2
 
 encoder_inputs = keras.Input(shape=(479,))
 x = layers.Dense(256, activation="relu")(encoder_inputs)
+x = layers.Dense(256, activation="relu")(x)
+x = layers.Dense(128, activation="relu")(x)
 x = layers.Dense(64, activation="relu")(x)
 x = layers.Dense(32, activation="relu")(x)
 z_mean = layers.Dense(latent_dim, name="z_mean")(x)
@@ -33,6 +35,8 @@ encoder.summary()
 latent_inputs = keras.Input(shape=(latent_dim,))
 x = layers.Dense(32, activation="relu")(latent_inputs)
 x = layers.Dense(64, activation="relu")(x)
+x = layers.Dense(128, activation="relu")(x)
+x = layers.Dense(256, activation="relu")(x)
 x = layers.Dense(256, activation="relu")(x)
 x = layers.Dense(479, activation="sigmoid")(x)
 decoder_outputs = layers.Reshape((479,))(x)
@@ -89,11 +93,11 @@ _, x_train, y_train, x_test, y_test = load_data(args)
 
 vae = VAE(encoder, decoder)
 vae.compile(optimizer=keras.optimizers.Adam())
-vae.fit(x_train, epochs=50, batch_size=128)
+vae.fit(x_train, epochs=30, batch_size=128)
 plot_label_clusters(encoder, decoder, x_train, y_train)
 
 
-predictor_input = keras.Input(shape=(latent_dim,))
+predictor_input = keras.Input(shape=(latent_dim*2,))
 x = layers.Dense(8, activation="relu")(predictor_input)
 x = layers.Dense(16, activation="relu")(x)
 x = layers.Dense(8, activation="relu")(x)
@@ -102,17 +106,15 @@ predictor = keras.Model(predictor_input, predictor_output, name="predictor")
 
 predictor.compile(loss=keras.losses.binary_crossentropy, optimizer=keras.optimizers.Adam())
 
-print(x_train.shape)
 x_train_mean, x_train_sd, _ = encoder.predict(x_train)
 x_train = np.concatenate((x_train_mean, x_train_sd), axis=1)
-print(x_train.shape)
-predictor.fit(x_train_mean, y_train, epochs=10, batch_size=128)
+predictor.fit(x_train, y_train, epochs=30, batch_size=128)
 
 # Test model
 x_test_mean, x_test_sd, _ = encoder.predict(x_test)
 x_test = np.concatenate((x_test_mean, x_test_sd), axis=1)
 
-pred_out = predictor.predict(x_test_mean)
+pred_out = predictor.predict(x_test)
 accuracy_val, sensitivity_val, specificity_val, precision_val, au_roc_val, cm_val = compute_metrics_standardized(
     pred_out, y_test)
 
@@ -123,4 +125,14 @@ print(f"\tPrecision   : {precision_val:.3f}")
 print(f"\tAUC         : {au_roc_val:.3f}")
 print(f"{cm_val}")
 
+pred_out = predictor.predict(x_train)
+accuracy_val, sensitivity_val, specificity_val, precision_val, au_roc_val, cm_val = compute_metrics_standardized(
+            pred_out, y_train)
+
+print(f"\tAccuracy    : {accuracy_val:.3f}")
+print(f"\tSensitivity : {sensitivity_val:.3f}")
+print(f"\tSpecificity : {specificity_val:.3f}")
+print(f"\tPrecision   : {precision_val:.3f}")
+print(f"\tAUC         : {au_roc_val:.3f}")
+print(f"{cm_val}")
 

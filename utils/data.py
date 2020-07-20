@@ -27,8 +27,8 @@ def D_data(n_samples, G, mode, x_train, latent_dim):
 
 
 def load_data(args):
-    train_size = int(args.data_size * 0.8)
-    test_size = int(args.data_size * 0.1)
+    train_size = int(args.data_size * 0.1)
+    test_size = int(args.data_size * 0.8)
     val_size = int(args.data_size * 0.1)
 
     modification_ratio = 0.5
@@ -54,8 +54,8 @@ def load_data(args):
             if data_count == total_from_non_modified:
                 break
             # The second last row contains the 360 signal values, separated by commas
-            if row[6][6:11] != 'CGCGC':
-                continue
+            #if row[6][6:11] != 'ATCGA':
+            #    continue
             row_data = []
             for i in row[6]:
                 row_data.extend(dna_lookup[i])
@@ -80,8 +80,8 @@ def load_data(args):
             if data_count == total_from_modified:
                 break
             # The second last row contains the 360 signal values, separated by commas
-            if row[6][6:11] != 'CGCGC':
-                continue
+            #if row[6][6:11] != 'ATCGA':
+            #    continue
             row_data = []
             for i in row[6]:
                 row_data.extend(dna_lookup[i])
