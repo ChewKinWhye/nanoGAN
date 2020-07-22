@@ -18,7 +18,7 @@ class Sampling(layers.Layer):
         epsilon = tf.keras.backend.random_normal(shape=(batch, dim))
         return z_mean + tf.exp(0.5 * z_log_var) * epsilon
 
-latent_dim = 2
+latent_dim = 10
 
 encoder_inputs = keras.Input(shape=(479,))
 x = layers.Dense(256, activation="relu")(encoder_inputs)

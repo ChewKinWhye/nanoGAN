@@ -27,8 +27,8 @@ def D_data(n_samples, G, mode, x_train, latent_dim):
 
 
 def load_data(args):
-    train_size = int(args.data_size * 0.1)
-    test_size = int(args.data_size * 0.8)
+    train_size = int(args.data_size * 0.8)
+    test_size = int(args.data_size * 0.1)
     val_size = int(args.data_size * 0.1)
 
     modification_ratio = 0.5
@@ -50,6 +50,7 @@ def load_data(args):
         read_tsv = csv.reader(tsv_file, delimiter="\t")
         non_modified_data = []
         data_count = 0
+        counter = 0
         for row in read_tsv:
             if data_count == total_from_non_modified:
                 break
@@ -64,6 +65,13 @@ def load_data(args):
             row_data.extend(row[9].split(","))
             row_data.extend(row[10].split(","))
             row_data_float = [float(i) for i in row_data]
+            signal_float = [float(i) for i in row[10].split(",")]
+            len_float = [float(i) for i in row[9].split(",")]
+            sd_float = [float(i) for i in row[8].split(",")]
+            if max(signal_float) > 4 or min(signal_float) < -4 or max(len_float) > 150 or max(sd_float) > 1:
+                counter += 1
+                continue
+            
             # Check for data inconsistencies, and to only use the template strand
             if row[5].lower() == 'c' or len(row_data) != 479 or row[-1] != "0":
                 continue
@@ -91,22 +99,49 @@ def load_data(args):
             row_data.extend(row[10].split(","))
             row_data_float = [float(i) for i in row_data]
             # Check for data inconsistencies, and to only use the template strand
+            signal_float = [float(i) for i in row[10].split(",")]
+            len_float = [float(i) for i in row[9].split(",")]
+            sd_float = [float(i) for i in row[8].split(",")]
+            if max(signal_float) > 4 or min(signal_float) < -4 or max(len_float) > 150 or max(sd_float) > 1:
+                counter += 1
+                continue
+            
             if row[5].lower() == 'c' or len(row_data) != 479 or row[-1] != "1":
                 continue
             # The last row represents the methylation state. We only want to train the model on unmethylated datapoints
             modified_data.append(row_data_float)
             data_count += 1
     
+    print(f"COUNTER: {counter}")
+    non_modified_data.extend(modified_data)
+    total = np.asarray(non_modified_data)
+    feature_1 = total[:, 0:68]
+    feature_2 = total[:, 68:85]
+    feature_3 = total[:, 85:102]
+    feature_4 = total[:, 102:119]
+    signals = total[:, 119:]
+    # Standardize features by block
+    total = [feature_1, feature_2, feature_3, feature_4, signals]
+    for i in range(len(total)):
+        temp_max = np.amax(total[i])
+        temp_min = np.amin(total[i])
+        print(temp_max)
+        print(temp_min)
+        total[i] = (total[i] - temp_min) / (temp_max - temp_min)
+    '''
+    signal_max = np.amax(signals)
+    signal_min = np.amin(signals)
+    signals = (signals - signal_min) / (signal_max - signal_min)
+    total_min_max = list(np.concatenate((features, signals), axis=1))
+    '''
+    total = list(np.concatenate((total[0], total[1], total[2], total[3], total[4]), axis=1))
+    non_modified_data = total[0:total_from_non_modified]
+    modified_data = total[total_from_non_modified:]
+    
     random.shuffle(non_modified_data)
     random.shuffle(modified_data)
-
     # Normalize data
 
-    max_val = max(max(max(non_modified_data)), max(max(modified_data)))
-    min_val = min(min(min(non_modified_data)), min(min(modified_data)))
-    range_val = max_val - min_val
-    non_modified_data = list((np.asarray(non_modified_data) - min_val) / range_val)
-    modified_data = list((np.asarray(modified_data) - min_val) / range_val)
     print(non_modified_data[0][24:44])
     print(non_modified_data[1][24:44])
     print(non_modified_data[2][24:44])
