@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.metrics import auc, precision_recall_curve, confusion_matrix, roc_curve, f1_score, accuracy_score, recall_score, precision_score
+import random
 
 
 def compute_metrics(y_predicted, y_test, threshold):
@@ -88,3 +89,17 @@ def plot_prc(results, y_test, threshold):
     plt.axis([0, 1, 0, 1])
     plt.legend()
     return plt
+
+
+def plot_label_clusters(encoder, data, labels):
+    # display a 2D plot of the digit classes in the latent space
+    filter_indices = random.sample(range(0, data.shape[0]-1), 3000)
+    data_sample = np.take(data, filter_indices, axis=0)
+    label_sample = np.take(labels, filter_indices, axis=0)
+    z_mean, _, _ = encoder.predict(data_sample)
+    plt.figure(figsize=(12, 10))
+    plt.scatter(z_mean[:, 0], z_mean[:, 1], c=label_sample, s=0.5)
+    plt.colorbar()
+    plt.xlabel("z[0]")
+    plt.ylabel("z[1]")
+    plt.show()

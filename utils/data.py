@@ -3,6 +3,8 @@ import csv
 import os
 import random
 from sklearn import preprocessing
+from sklearn.utils import shuffle
+
 
 def noise_data(n_samples, latent_dim):
     return np.random.normal(0, 1, [n_samples, latent_dim])
@@ -24,6 +26,36 @@ def D_data(n_samples, G, mode, x_train, latent_dim):
         y0 = np.zeros(n_samples)
 
         return x_gen, y0
+
+
+def load_rna_data_vae(args):
+    train_size = int(args.data_size * 0.8)
+    test_size = int(args.data_size * 0.1)
+    file_path_normal = os.path.join(args.data_path, "epinano_rna_data.csv")
+    X = []
+    Y = []
+    with open(file_path_normal) as tsv_file:
+        read_tsv = csv.reader(tsv_file, delimiter=",")
+        for i, row in enumerate(read_tsv):
+            if i == 0:
+                continue
+            Y.append(int(row[0]))
+            row_float = [float(x) for x in row[1:]]
+            X.append(row_float[1:])
+    # Normalize between 0 and 1
+    min_max_scalar = preprocessing.MinMaxScaler()
+    X = min_max_scalar.fit_transform(np.asarray(X))
+    Y = np.asarray(Y)
+    X, Y = shuffle(X, Y, random_state=0)
+    x_train = X[0:train_size, :]
+    y_train = Y[0:train_size]
+    x_test = X[train_size: train_size + test_size, :]
+    y_test = Y[train_size: train_size + test_size]
+
+    x_val = X[train_size + test_size:, :]
+    y_val = Y[train_size + test_size:]
+
+    return x_train, y_train, x_test, y_test, x_val, y_val
 
 
 def load_data(args):
@@ -168,3 +200,55 @@ def load_data(args):
     print(f"Validation data labels shape: {val_data_labels.shape}")
     return train_data, test_data, test_data_labels, val_data, val_data_labels
 
+
+def load_multiple_reads_data(args):
+    test_size = 1000
+
+    modification_ratio = 0.5
+    dna_lookup = {"A": [0, 0, 0, 1], "T": [0, 0, 1, 0], "G": [0, 1, 0, 0], "C": [1, 0, 0, 0]}
+    # Global parameters
+    file_path_normal = os.path.join(args.data_path, "pcr.tsv")
+    file_path_modified = os.path.join(args.data_path, "msssi.tsv")
+    total_from_non_modified = 5000000
+    total_from_modified = 5000000
+    non_modified_duplicate = {}
+    non_modified_duplicate_10 = []
+    # Extract data from non-modified
+    with open(file_path_normal) as tsv_file:
+        read_tsv = csv.reader(tsv_file, delimiter="\t")
+        data_count = 0
+        for index, row in enumerate(read_tsv):
+            if row[3] in non_modified_duplicate:
+                non_modified_duplicate[row[3]][0] += 1
+            else:
+                non_modified_duplicate[row[3]] = [1]
+            non_modified_duplicate[row[3]].append(index)
+            data_count += 1
+
+    for x in non_modified_duplicate:
+        if non_modified_duplicate[x][0] >= 10:
+            non_modified_duplicate_10.append(non_modified_duplicate[x])
+
+    modified_duplicate = {}
+    modified_duplicate_10 = []
+    with open(file_path_modified) as tsv_file:
+        read_tsv = csv.reader(tsv_file, delimiter="\t")
+        data_count = 0
+        for index, row in enumerate(read_tsv):
+            if data_count == total_from_modified:
+                break
+            if row[3] in modified_duplicate:
+                modified_duplicate[row[3]][0] += 1
+            else:
+                modified_duplicate[row[3]] = [1]
+            modified_duplicate[row[3]].append(index)
+            data_count += 1
+    for x in modified_duplicate:
+        if modified_duplicate[x][0] >= 10:
+            modified_duplicate_10.append(modified_duplicate[x])
+    print(len(modified_duplicate_10))
+    print(len(non_modified_duplicate_10))
+    test_x = modified_duplicate_10[10000:20000]
+    test_x.extend(non_modified_duplicate_10[10000:20000])
+    test_y = np.append(np.ones(10000), np.zeros(10000))
+    return test_x, test_y

@@ -2,7 +2,7 @@ import numpy as np
 from tqdm import trange
 
 from utils.model import K, gamma, set_trainability
-from utils.evaluate import compute_metrics, compute_metrics_standardized
+from utils.evaluate import compute_metrics_standardized
 from utils.data import D_data, noise_data
 from utils.save import save_model
 

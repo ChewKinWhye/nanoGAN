@@ -1,3 +1,4 @@
+'''
 from data2 import load_data
 from arguments import parse_args
 
@@ -21,3 +22,5 @@ with open(args.data_path, 'r') as f
 
 print(len(predictions))
 best_accuracy, best_sensitivity, best_specificity, best_precision, best_au_roc, best_cm = compute_metrics_standardized(predictions, y_test)
+
+'''

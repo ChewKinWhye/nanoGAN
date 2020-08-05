@@ -79,7 +79,8 @@ def load_dc_gan_model(args):
     gan.summary()
     return generator, discriminator, gan
 
-def load_deep_signal_model(args):
+
+def load_deep_signal_gan_model(args):
     # Building Generator
     g_in = Input(shape=(args.latent_dim,))
     
@@ -97,7 +98,7 @@ def load_deep_signal_model(args):
     x = AveragePooling2D(pool_size=(1, 7), strides=5)(x)
     x = AveragePooling2D(pool_size=(1, 5), strides=3)(x)
     x = Reshape((-1,))(x)
-    bottom_out = Dense(360, activation='tanh')(x)
+    bottom_out = Dense(360, activation='sigmoid')(x)
     g_out = Concatenate(axis=1)([top_out, bottom_out])
     G = Model(g_in, g_out)
     G.summary()
@@ -138,7 +139,7 @@ def load_deep_signal_model(args):
     return G, D, gan
 
 
-def load_model(args):
+def load_basic_gan_model(args):
     # Building Generator
     G = Sequential()
     G.add(Dense(args.latent_dim, input_dim=args.latent_dim))
@@ -146,7 +147,7 @@ def load_model(args):
     G.add(BatchNormalization(momentum=0.8))
     G.add(Reshape((args.latent_dim, 1)))
     G.add(LSTM(4))
-    G.add(Dense(479, activation='tanh'))
+    G.add(Dense(479, activation='sigmoid'))
     G.summary()
     # Building Discriminator
     D = Sequential()

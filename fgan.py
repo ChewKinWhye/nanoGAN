@@ -1,7 +1,7 @@
 from utils.arguments import parse_args
 from utils.data import load_data
-from utils.model import load_deep_signal_model, load_model, load_dc_gan_model
-from utils.train_model import pre_train, train
+from utils.model import load_deep_signal_gan_model, load_basic_gan_model, load_dc_gan_model
+from utils.train import pre_train, train
 
 import numpy as np
 import tensorflow as tf
