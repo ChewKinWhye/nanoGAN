@@ -44,17 +44,18 @@ with open(file_path_normal, 'r') as f:
         feature_3 = row_input[:, 85:102]
         feature_4 = row_input[:, 102:119]
         signals = row_input[:, 119:]
-        # Standardize features by block
+        # Normalize features by block
         total = [feature_1, feature_2, feature_3, feature_4, signals]
         # Find temp_min and temp_max
-        temp_min, temp_max = 0, 0
+        temp_min = [0, 0, 0, 0, 0]
+        temp_max = [0, 0, 0, 0, 0]
+
         for i in range(len(total)):
-            total[i] = (total[i] - temp_min) / (temp_max - temp_min)
+            total[i] = (total[i] - temp_min[i]) / (temp_max[i] - temp_min[i])
         total = list(np.concatenate((total[0], total[1], total[2], total[3], total[4]), axis=1))
         temp_prediction = 1 - np.squeeze(model.predict_on_batch(total))
         predictions.append(sum(temp_prediction)/len(temp_prediction))
 
-print(len(predictions))
 best_accuracy, best_sensitivity, best_specificity, best_precision, best_au_roc, best_cm = compute_metrics_standardized(predictions, y_modified)
 
 print(f"\tAccuracy    : {best_accuracy:.3f}")
