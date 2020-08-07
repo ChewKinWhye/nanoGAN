@@ -38,3 +38,30 @@ print(f"\tSpecificity : {specificity_val:.3f}")
 print(f"\tPrecision   : {precision_val:.3f}")
 print(f"\tAUC         : {au_roc_val:.3f}")
 print(f"{cm_val}")
+
+accuracy_val, sensitivity_val, specificity_val, precision_val, au_roc_val, cm_val = compute_metrics_standardized_confident(
+    pred_out, y_test, confidence=0.4)
+print(f"\tAccuracy    : {accuracy_val:.3f}")
+print(f"\tSensitivity : {sensitivity_val:.3f}")
+print(f"\tSpecificity : {specificity_val:.3f}")
+print(f"\tPrecision   : {precision_val:.3f}")
+print(f"\tAUC         : {au_roc_val:.3f}")
+print(f"{cm_val}")
+
+accuracy_val, sensitivity_val, specificity_val, precision_val, au_roc_val, cm_val = compute_metrics_standardized_confident(
+    pred_out, y_test, confidence=0.3)
+print(f"\tAccuracy    : {accuracy_val:.3f}")
+print(f"\tSensitivity : {sensitivity_val:.3f}")
+print(f"\tSpecificity : {specificity_val:.3f}")
+print(f"\tPrecision   : {precision_val:.3f}")
+print(f"\tAUC         : {au_roc_val:.3f}")
+print(f"{cm_val}")
+
+accuracy_val, sensitivity_val, specificity_val, precision_val, au_roc_val, cm_val = compute_metrics_standardized_confident(
+    pred_out, y_test, confidence=0.2)
+print(f"\tAccuracy    : {accuracy_val:.3f}")
+print(f"\tSensitivity : {sensitivity_val:.3f}")
+print(f"\tSpecificity : {specificity_val:.3f}")
+print(f"\tPrecision   : {precision_val:.3f}")
+print(f"\tAUC         : {au_roc_val:.3f}")
+print(f"{cm_val}")

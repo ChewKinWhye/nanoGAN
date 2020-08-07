@@ -23,12 +23,12 @@ def compute_metrics_standardized(y_predicted, y_test):
     return accuracy, sensitivity, specificity, precision, au_roc, cm
 
 
-def compute_metrics_standardized_confident(y_predicted, y_test):
+def compute_metrics_standardized_confident(y_predicted, y_test, confidence):
     y_predicted_confident = []
     y_test_confident = []
     for i in range(len(y_predicted)):
         # Confident if it predicts very low or very high
-        if y_predicted[i] < 0.45 or y_predicted[i] > 0.55:
+        if y_predicted[i] < confidence or y_predicted[i] > 1 - confidence:
             y_predicted_confident.append(y_predicted[i])
             y_test_confident.append(y_test[i])
 

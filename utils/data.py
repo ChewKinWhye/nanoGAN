@@ -237,9 +237,5 @@ def load_multiple_reads_data(args):
     for x in modified_duplicate:
         if modified_duplicate[x][0] >= 10:
             modified_duplicate_10.append(modified_duplicate[x])
-    print(len(modified_duplicate_10))
-    print(len(non_modified_duplicate_10))
-    test_x = modified_duplicate_10[10000:20000]
-    test_x.extend(non_modified_duplicate_10[10000:20000])
-    test_y = np.append(np.ones(10000), np.zeros(10000))
-    return test_x, test_y
+
+    return modified_duplicate_10, non_modified_duplicate_10, np.ones(10000), np.zeros(10000)

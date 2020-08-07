@@ -1,4 +1,4 @@
-from utils.custom_losses import *
+from custom_losses import *
 
 import keras.backend as K
 from keras import losses

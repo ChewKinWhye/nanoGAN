@@ -241,6 +241,7 @@ def train(g_model, c_model, gan_model, dataset, latent_dim, n_epochs=10, n_batch
     # line plots of loss
     plot_history(c1_hist, c2_hist, g_hist)
 
+
 args = parse_args()
 # size of the latent space
 latent_dim = args.latent_dim
