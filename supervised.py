@@ -1,7 +1,7 @@
 from utils.arguments import parse_args
-from utils.data import load_data
+from utils.data import load_dna_data_gan
 from utils.evaluate import compute_metrics_standardized
-from utils.model import load_deep_signal_supervised
+from utils.gan_model import load_deep_signal_supervised
 
 import numpy as np
 import tensorflow as tf
@@ -10,7 +10,7 @@ args = parse_args()
 np.random.seed(args.seed)
 tf.compat.v1.set_random_seed(args.seed)
 
-x_train, x_test, y_test, x_val, y_val = load_data(args)
+x_train, x_test, y_test, x_val, y_val = load_dna_data_gan(args)
 model = load_deep_signal_supervised(args)
 
 model.fit(x_test, y_test, epochs=150, batch_size=512, validation_data=(x_val, y_val))

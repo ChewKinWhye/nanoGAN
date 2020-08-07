@@ -12,7 +12,7 @@ from keras.initializers import RandomNormal
 from keras.constraints import Constraint
 from matplotlib import pyplot
 from utils.arguments import parse_args
-from utils.data import load_data
+from utils.data import load_dna_data_gan
 from keras.layers import Reshape, LeakyReLU, Input, Dense, BatchNormalization, LSTM
 from utils.evaluate import compute_metrics_standardized
 import numpy as np
@@ -120,7 +120,7 @@ def define_gan(generator, critic):
 # load images
 def load_real_samples():
     # load dataset
-    (trainX, trainy), (_, _) = load_data()
+    (trainX, trainy), (_, _) = load_dna_data_gan()
     # select all of the examples for a given class
     selected_ix = trainy == 7
     X = trainX[selected_ix]
@@ -251,7 +251,7 @@ generator = define_generator()
 # create the gan
 gan_model = define_gan(generator, critic)
 # load image data
-x_train, x_test, y_test, x_val, y_val = load_data(args)
+x_train, x_test, y_test, x_val, y_val = load_dna_data_gan(args)
 print(x_train.shape)
 # train model
 train(generator, critic, gan_model, x_train, latent_dim, n_epochs=args.epochs)

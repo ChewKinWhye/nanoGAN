@@ -1,10 +1,10 @@
 import numpy as np
 from tqdm import trange
 
-from utils.model import K, gamma, set_trainability
+from utils.gan_model import K, gamma, set_trainability
 from utils.evaluate import compute_metrics_standardized
 from utils.data import D_data, noise_data
-from utils.save import save_model
+from utils.save import save_gan_model
 
 
 def pre_train(args, generator, discriminator, x_train):
@@ -72,7 +72,7 @@ def train(args, generator, discriminator, GAN, x_train, x_test, y_test, x_val, y
             # Check for the best validation results
             y_predicted = 1 - np.squeeze(discriminator.predict_on_batch(x_val))
             x = noise_data(batch_size, latent_dim)
-            print(generator.predict_on_batch(x)[0:5, 24:44])
+            print(generator.predict_on_batch(x)[0, 24:44])
             accuracy_val, sensitivity_val, specificity_val, precision_val, au_roc_val, cm_val = compute_metrics_standardized(y_predicted, y_val)
 
             if au_roc_val > best_au_roc_val:
@@ -80,7 +80,7 @@ def train(args, generator, discriminator, GAN, x_train, x_test, y_test, x_val, y
                 # Save the best test results
                 y_predicted = 1 - np.squeeze(discriminator.predict_on_batch(x_test))
                 best_accuracy, best_sensitivity, best_specificity, best_precision, best_au_roc, best_cm = compute_metrics_standardized(y_predicted, y_test)
-                save_model(args, discriminator)
+                save_gan_model(args, discriminator)
                 
             print(f"\tAccuracy    : {accuracy_val:.3f}")
             print(f"\tSensitivity : {sensitivity_val:.3f}")
