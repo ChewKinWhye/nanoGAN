@@ -166,6 +166,7 @@ def load_dna_data_vae(args):
     train_x = np.asarray(train_x)
     train_y = np.append(np.ones(train_size), np.zeros(train_size))
     train_y.astype(int)
+    train_x, train_y = shuffle(train_x, train_y, random_state=0)
 
     test_x = modified_data[train_size:train_size + test_size]
     test_x.extend(non_modified_data[train_size:train_size + test_size])
