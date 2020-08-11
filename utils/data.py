@@ -59,7 +59,134 @@ def load_rna_data_vae(args):
 
 
 def load_dna_data_vae(args):
-    pass
+    # Global parameters
+    train_size = int(args.data_size * 0.8 / 2)
+    test_size = int(args.data_size * 0.1 / 2)
+    val_size = int(args.data_size * 0.1 / 2)
+    total_size = train_size + test_size + val_size
+
+    dna_lookup = {"A": [0, 0, 0, 1], "T": [0, 0, 1, 0], "G": [0, 1, 0, 0], "C": [1, 0, 0, 0]}
+    file_path_normal = os.path.join(args.data_path, "pcr.tsv")
+    file_path_modified = os.path.join(args.data_path, "msssi.tsv")
+
+    # Extract data from non-modified
+    with open(file_path_normal) as tsv_file:
+        read_tsv = csv.reader(tsv_file, delimiter="\t")
+        non_modified_data = []
+        data_count = 0
+        outlier_counter = 0
+        for row in read_tsv:
+            if data_count == total_size:
+                break
+            row_data = []
+            # Append the row data values
+            for i in row[6]:
+                row_data.extend(dna_lookup[i])
+            row_data.extend(row[7].split(","))
+            row_data.extend(row[8].split(","))
+            row_data.extend(row[9].split(","))
+            row_data.extend(row[10].split(","))
+            row_data_float = [float(i) for i in row_data]
+            signal_float = [float(i) for i in row[10].split(",")]
+            len_float = [float(i) for i in row[9].split(",")]
+            sd_float = [float(i) for i in row[8].split(",")]
+
+            # Check for data outliers
+            if max(signal_float) > 4 or min(signal_float) < -4 or max(len_float) > 150 or max(sd_float) > 1:
+                outlier_counter += 1
+                continue
+            # Check for data errors
+            if row[5].lower() == 'c' or len(row_data) != 479 or row[-1] != "0":
+                continue
+
+            non_modified_data.append(row_data_float)
+            data_count += 1
+
+    with open(file_path_modified) as tsv_file:
+        read_tsv = csv.reader(tsv_file, delimiter="\t")
+        modified_data = []
+        data_count = 0
+        for i, row in enumerate(read_tsv):
+            # 3000 test data points
+            if data_count == total_size:
+                break
+
+            row_data = []
+            for i in row[6]:
+                row_data.extend(dna_lookup[i])
+            row_data.extend(row[7].split(","))
+            row_data.extend(row[8].split(","))
+            row_data.extend(row[9].split(","))
+            row_data.extend(row[10].split(","))
+            row_data_float = [float(i) for i in row_data]
+            signal_float = [float(i) for i in row[10].split(",")]
+            len_float = [float(i) for i in row[9].split(",")]
+            sd_float = [float(i) for i in row[8].split(",")]
+
+            # Check for data outliers
+            if max(signal_float) > 4 or min(signal_float) < -4 or max(len_float) > 150 or max(sd_float) > 1:
+                outlier_counter += 1
+                continue
+                # Check for data errors
+            if row[5].lower() == 'c' or len(row_data) != 479 or row[-1] != "1":
+                continue
+            modified_data.append(row_data_float)
+            data_count += 1
+
+    print(f"Number of outliers: {outlier_counter}")
+
+    # Normalize data
+    non_modified_data.extend(modified_data)
+    total = np.asarray(non_modified_data)
+    feature_1 = total[:, 0:68]
+    feature_2 = total[:, 68:85]
+    feature_3 = total[:, 85:102]
+    feature_4 = total[:, 102:119]
+    signals = total[:, 119:]
+    # Standardize features by block
+    total = [feature_1, feature_2, feature_3, feature_4, signals]
+    min_values = []
+    max_values = []
+    for i in range(len(total)):
+        temp_max = np.amax(total[i])
+        temp_min = np.amin(total[i])
+        max_values.append(temp_max)
+        min_values.append(temp_min)
+        total[i] = (total[i] - temp_min) / (temp_max - temp_min)
+    total = list(np.concatenate((total[0], total[1], total[2], total[3], total[4]), axis=1))
+
+    non_modified_data = total[0:total_size]
+    modified_data = total[total_size:]
+
+    random.shuffle(non_modified_data)
+    random.shuffle(modified_data)
+
+    train_x = modified_data[0:train_size]
+    train_x.extend(non_modified_data[0:train_size])
+    train_x = np.asarray(train_x)
+    train_y = np.append(np.ones(train_size), np.zeros(train_size))
+    train_y.astype(int)
+
+    test_x = modified_data[train_size:train_size + test_size]
+    test_x.extend(non_modified_data[train_size:train_size + test_size])
+    test_x = np.asarray(test_x)
+    test_y = np.append(np.ones(test_size), np.zeros(test_size))
+    test_y.astype(int)
+
+    val_x = modified_data[train_size + test_size:]
+    val_x.extend(non_modified_data[train_size + test_size:])
+    val_x = np.asarray(val_x)
+    val_y = np.append(np.ones(val_size), np.zeros(val_size))
+    val_y.astype(int)
+
+    print(f"Train data shape: {train_x.shape}")
+    print(f"Train data labels shape: {train_y.shape}")
+    print(f"Test data shape: {test_x.shape}")
+    print(f"Test data labels shape: {test_y.shape}")
+    print(f"Validation data shape: {val_x.shape}")
+    print(f"Validation data labels shape: {val_y.shape}")
+
+    return train_x, train_y, test_x, test_y, val_x, val_y, min_values, max_values
 
 
 def load_dna_data_gan(args):

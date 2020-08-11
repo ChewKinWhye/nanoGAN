@@ -11,7 +11,7 @@ os.system("CUDA_VISIBLE_DEVICES=-1 python fgan.py --epochs 300 --alpha 0.8 --bet
 #os.system("CUDA_VISIBLE_DEVICES=-1 python supervised.py --data_path /hdd/modifications/ecoli/deepsignal/ --data_size 100000")
 
 # Command for VAE
-#os.system("CUDA_VISIBLE_DEVICES=-1 python VAE.py --data_path /hdd/modifications/ecoli/deepsignal/ --data_size 200000")
+#os.system("CUDA_VISIBLE_DEVICES=-1 python VAE_RNA.py --data_path /hdd/modifications/ecoli/deepsignal/ --data_size 200000")
 
 print("COMPLETED PIPELINE")
 
