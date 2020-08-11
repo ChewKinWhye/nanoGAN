@@ -18,7 +18,7 @@ def save_gan_model(args, model):
 
 def save_results(args, results):
     create_directories(args)
-    result_path = f'./results/{args.output_filename}/'
+    result_path = f'./results/{args.output_filename}'
 
     result_json = {
         "Best au_prc": round(results[0], 3),
@@ -31,7 +31,7 @@ def save_results(args, results):
 
 
 def save_vae_model_dna(encoder, predictor, min_values, max_values):
-    result_path = f'./results/VAE_DNA_model/'
+    result_path = f'./results/VAE_DNA_model'
     if not os.path.exists('./results'):
         os.makedirs('./results')
     if not os.path.exists(result_path):
@@ -47,7 +47,11 @@ def save_vae_model_dna(encoder, predictor, min_values, max_values):
 
 
 def save_vae_model_rna(args, encoder, predictor):
-    create_directories(args)
-    result_path = f'./results/VAE_RNA_model/'
+    result_path = f'./results/VAE_RNA_model'
+    if not os.path.exists('./results'):
+        os.makedirs('/.results')
+    if not os.path.exists(result_path):
+        os.makedirs(result_path)
+
     encoder.save(f'{result_path}/encoder.h5')
     predictor.save(f'{result_path}/predictor.h5')
