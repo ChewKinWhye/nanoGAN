@@ -11,7 +11,7 @@ import os
 #os.system("CUDA_VISIBLE_DEVICES=-1 python supervised.py --data_path /hdd/modifications/ecoli/deepsignal/ --data_size 100000")
 
 # VAE DNA
-os.system("CUDA_VISIBLE_DEVICES=-1 python VAE_DNA.py --data_path /hdd/modifications/ecoli/deepsignal/ --data_size 1000000")
+os.system("CUDA_VISIBLE_DEVICES=-1 python VAE_DNA.py --data_path /hdd/modifications/ecoli/deepsignal/ --data_size 500000")
 
 # VAE RNA
 #os.system("CUDA_VISIBLE_DEVICES=-1 python VAE_RNA.py --data_path /hdd/modifications/ecoli/deepsignal/ --data_size 49000")

@@ -80,6 +80,8 @@ def load_dna_data_vae(args):
                 break
             row_data = []
             # Append the row data values
+            if row[6][6:11] != "ATCGA":
+                continue
             for i in row[6]:
                 row_data.extend(dna_lookup[i])
             row_data.extend(row[7].split(","))
@@ -110,7 +112,8 @@ def load_dna_data_vae(args):
             # 3000 test data points
             if data_count == total_size:
                 break
-
+            if row[6][6:11] != 'ATCGA':
+                continue
             row_data = []
             for i in row[6]:
                 row_data.extend(dna_lookup[i])

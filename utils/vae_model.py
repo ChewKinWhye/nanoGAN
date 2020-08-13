@@ -25,8 +25,10 @@ class VAE_DNA(keras.Model):
     def load_encoder(self):
         encoder_inputs = keras.Input(shape=(479,))
         x = layers.Dense(256, activation="relu")(encoder_inputs)
+        '''
         x = layers.Dense(256, activation="relu")(x)
         x = layers.Dense(128, activation="relu")(x)
+        '''
         x = layers.Dense(64, activation="relu")(x)
         x = layers.Dense(32, activation="relu")(x)
         z_mean = layers.Dense(self.latent_dim, name="z_mean")(x)
@@ -40,8 +42,10 @@ class VAE_DNA(keras.Model):
         latent_inputs = keras.Input(shape=(self.latent_dim,))
         x = layers.Dense(32, activation="relu")(latent_inputs)
         x = layers.Dense(64, activation="relu")(x)
+        '''
         x = layers.Dense(128, activation="relu")(x)
         x = layers.Dense(256, activation="relu")(x)
+        '''
         x = layers.Dense(256, activation="relu")(x)
         x = layers.Dense(479, activation="sigmoid")(x)
         decoder_outputs = layers.Reshape((479,))(x)
@@ -68,7 +72,7 @@ class VAE_DNA(keras.Model):
             reconstruction_loss = tf.reduce_mean(
                 keras.losses.binary_crossentropy(data, reconstruction)
             )
-            reconstruction_loss *= 479
+            reconstruction_loss *= 100
             kl_loss = 1 + z_log_var - tf.square(z_mean) - tf.exp(z_log_var)
             kl_loss = tf.reduce_mean(kl_loss)
             kl_loss *= -0.5

@@ -11,14 +11,16 @@ latent_dim = 10
 args = parse_args()
 x_train, y_train, x_test, y_test, x_val, y_val, min_values, max_values = load_dna_data_vae(args)
 
-# Train encoder
+# Train VAE
 vae = VAE_DNA(latent_dim)
 vae.compile(optimizer=keras.optimizers.Adam())
-vae.fit(x_train, epochs=200, batch_size=128)
+vae.fit(x_train, epochs=150, batch_size=128)
 
 # Visualize cluster
-encoder = vae.encoder
+print(x_train[0:5, 24:44])
+print(vae.decoder.predict(vae.encoder.predict(x_train[0:5, :]))[:, 24:44])
 predictor = vae.predictor
+encoder = vae.encoder
 plot_label_clusters(encoder, x_train, y_train)
 
 # Train predictor
