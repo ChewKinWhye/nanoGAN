@@ -48,4 +48,3 @@ print(f"\tPrecision   : {precision_val:.3f}")
 print(f"\tAUC         : {au_roc_val:.3f}")
 print(f"{cm_val}")
 
-#test_x, test_y = load_multiple_reads_data(args)

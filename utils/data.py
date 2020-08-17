@@ -322,7 +322,7 @@ def load_multiple_reads_data(args):
     non_modified_duplicate = {}
     non_modified_duplicate_10 = []
     dna_lookup = {"A": [0, 0, 0, 1], "T": [0, 0, 1, 0], "G": [0, 1, 0, 0], "C": [1, 0, 0, 0]}
-
+    test_x = []
     # Extract data from non-modified
     with open(file_path_normal) as tsv_file:
         read_tsv = csv.reader(tsv_file, delimiter="\t")
@@ -332,12 +332,32 @@ def load_multiple_reads_data(args):
                 break
             if row[3] not in non_modified_duplicate:
                 non_modified_duplicate[row[3]] = []
-            non_modified_duplicate[row[3]].append(index)
+            # Append data instead of index
+            row_data = []
+            for i in row[6]:
+                row_data.extend(dna_lookup[i])
+            row_data.extend(row[7].split(","))
+            row_data.extend(row[8].split(","))
+            row_data.extend(row[9].split(","))
+            row_data.extend(row[10].split(","))
+            row_data_float = [float(i) for i in row_data]
+            signal_float = [float(i) for i in row[10].split(",")]
+            len_float = [float(i) for i in row[9].split(",")]
+            sd_float = [float(i) for i in row[8].split(",")]
+
+            # Check for data outliers
+            if max(signal_float) > 4 or min(signal_float) < -4 or max(len_float) > 150 or max(sd_float) > 1:
+                continue
+                # Check for data errors
+            if row[5].lower() == 'c' or len(row_data) != 479 or row[-1] != "1":
+                continue
+            non_modified_duplicate[row[3]].append(row_data_float)
             data_count += 1
     # Find the ones with more than 10 reads
     for x in non_modified_duplicate:
-        if len(non_modified_duplicate[row[3]]) >= 10:
-            non_modified_duplicate_10.append(non_modified_duplicate[x])
+        if len(non_modified_duplicate[x]) >= 10:
+            test_x.append(non_modified_duplicate[x][0:10])
+    test_x = test_x[0:test_size]
 
     modified_duplicate = {}
     modified_duplicate_10 = []
@@ -350,85 +370,38 @@ def load_multiple_reads_data(args):
                 break
             if row[3] not in modified_duplicate:
                 modified_duplicate[row[3]] = []
-            modified_duplicate[row[3]].append(index)
+            # Append data instead of index
+            row_data = []
+            for i in row[6]:
+                row_data.extend(dna_lookup[i])
+            row_data.extend(row[7].split(","))
+            row_data.extend(row[8].split(","))
+            row_data.extend(row[9].split(","))
+            row_data.extend(row[10].split(","))
+            row_data_float = [float(i) for i in row_data]
+            signal_float = [float(i) for i in row[10].split(",")]
+            len_float = [float(i) for i in row[9].split(",")]
+            sd_float = [float(i) for i in row[8].split(",")]
+
+            # Check for data outliers
+            if max(signal_float) > 4 or min(signal_float) < -4 or max(len_float) > 150 or max(sd_float) > 1:
+                continue
+                # Check for data errors
+            if row[5].lower() == 'c' or len(row_data) != 479 or row[-1] != "1":
+                continue
+            modified_duplicate[row[3]].append(row_data_float)
             data_count += 1
 
     # Find the ones with more than 10 reads
     for x in modified_duplicate:
         if len(modified_duplicate[x]) >= 10:
-            modified_duplicate_10.append(modified_duplicate[x][0:10])
-    print(len(modified_duplicate_10))
-    print(len(non_modified_duplicate_10))
-    modified_duplicate_10 = modified_duplicate_10[0:test_size]
-    non_modified_duplicate_10 = non_modified_duplicate_10[0:test_size]
-    test_x = []
-    test_y = np.append(np.ones(test_size), np.zeros(test_size))
-    with open(file_path_modified, 'r') as f:
-        for row in modified_duplicate_10:
-            position_input = []
-            for index in row:
-                try:
-                    temp_data = next(itertools.islice(csv.reader(f, delimiter="\t"), index, None))
-                except StopIteration:
-                    print("STOP ITERATION")
-                row_data = []
-                # Append the row data values
-                for i in temp_data[6]:
-                    row_data.extend(dna_lookup[i])
-                row_data.extend(temp_data[7].split(","))
-                row_data.extend(temp_data[8].split(","))
-                row_data.extend(temp_data[9].split(","))
-                row_data.extend(temp_data[10].split(","))
-
-                signal_float = [float(i) for i in temp_data[10].split(",")]
-                len_float = [float(i) for i in temp_data[9].split(",")]
-                sd_float = [float(i) for i in temp_data[8].split(",")]
-                # Check for data outliers
-                if max(signal_float) > 4 or min(signal_float) < -4 or max(len_float) > 150 or max(sd_float) > 1:
-                    continue
-                # Check for data errors
-                if temp_data[5].lower() == 'c' or len(row_data) != 479 or temp_data[-1] != "0":
-                    print("DATA ERRORS")
-                    continue
-                row_data_float = [float(i) for i in row_data]
-                position_input.append(row_data_float)
-                print("PASSED")
-            # Position input has 10 rows corresponding to 10 reads for a particular position
-            position_input = np.asarray(position_input)
-            test_x.append(position_input)
+            test_x.append(modified_duplicate[x][0:10])
+    test_x = test_x[0:2 * test_size]
+    # 20000 test points
     print(len(test_x))
-    with open(file_path_normal, 'r') as f:
-        for row in non_modified_duplicate_10:
-            position_input = []
-            for index in row:
-                try:
-                    temp_data = next(itertools.islice(csv.reader(f, delimiter="\t"), index, None))
-                except StopIteration:
-                    print("STOP ITERATION")
-                row_data = []
-                # Append the row data values
-                for i in temp_data[6]:
-                    row_data.extend(dna_lookup[i])
-                row_data.extend(temp_data[7].split(","))
-                row_data.extend(temp_data[8].split(","))
-                row_data.extend(temp_data[9].split(","))
-                row_data.extend(temp_data[10].split(","))
-
-                signal_float = [float(i) for i in row[10].split(",")]
-                len_float = [float(i) for i in row[9].split(",")]
-                sd_float = [float(i) for i in row[8].split(",")]
-                # Check for data outliers
-                if max(signal_float) > 4 or min(signal_float) < -4 or max(len_float) > 150 or max(sd_float) > 1:
-                    continue
-                # Check for data errors
-                if row[5].lower() == 'c' or len(row_data) != 479 or row[-1] != "0":
-                    continue
-                row_data_float = [float(i) for i in row_data]
-                position_input.append(row_data_float)
-                print("PASSED")
-            # Position input has 10 rows corresponding to 10 reads for a particular position
-            position_input = np.asarray(position_input)
-            test_x.append(position_input)
-    print(len(test_x))
-    print(len(test_y))
+    # Each test point contains 10 data point
+    print(len(test_x[0]))
+    # Each data point contains 360++ values
+    print(len(test_x[0][0]))
+    test_y = np.append( np.zeros(test_size), np.ones(test_size))
     return test_x, test_y
