@@ -330,6 +330,8 @@ def load_multiple_reads_data(args):
         for index, row in enumerate(read_tsv):
             if data_count == total_size:
                 break
+            if row[3] not in non_modified_duplicate:
+                non_modified_duplicate[row[3]] = []
             non_modified_duplicate[row[3]].append(index)
             data_count += 1
     # Find the ones with more than 10 reads
@@ -346,6 +348,8 @@ def load_multiple_reads_data(args):
         for index, row in enumerate(read_tsv):
             if data_count == total_size:
                 break
+            if row[3] not in modified_duplicate:
+                modified_duplicate[row[3]] = []
             modified_duplicate[row[3]].append(index)
             data_count += 1
 
@@ -363,7 +367,10 @@ def load_multiple_reads_data(args):
         for row in modified_duplicate_10:
             position_input = []
             for index in row:
-                temp_data = next(itertools.islice(csv.reader(f), index, None))
+                try:
+                    temp_data = next(itertools.islice(csv.reader(f, delimiter="\t"), index, None))
+                except StopIteration:
+                    print("STOP ITERATION")
                 row_data = []
                 # Append the row data values
                 for i in temp_data[6]:
@@ -373,17 +380,19 @@ def load_multiple_reads_data(args):
                 row_data.extend(temp_data[9].split(","))
                 row_data.extend(temp_data[10].split(","))
 
-                signal_float = [float(i) for i in row[10].split(",")]
-                len_float = [float(i) for i in row[9].split(",")]
-                sd_float = [float(i) for i in row[8].split(",")]
+                signal_float = [float(i) for i in temp_data[10].split(",")]
+                len_float = [float(i) for i in temp_data[9].split(",")]
+                sd_float = [float(i) for i in temp_data[8].split(",")]
                 # Check for data outliers
                 if max(signal_float) > 4 or min(signal_float) < -4 or max(len_float) > 150 or max(sd_float) > 1:
                     continue
                 # Check for data errors
-                if row[5].lower() == 'c' or len(row_data) != 479 or row[-1] != "0":
+                if temp_data[5].lower() == 'c' or len(row_data) != 479 or temp_data[-1] != "0":
+                    print("DATA ERRORS")
                     continue
                 row_data_float = [float(i) for i in row_data]
                 position_input.append(row_data_float)
+                print("PASSED")
             # Position input has 10 rows corresponding to 10 reads for a particular position
             position_input = np.asarray(position_input)
             test_x.append(position_input)
@@ -392,7 +401,10 @@ def load_multiple_reads_data(args):
         for row in non_modified_duplicate_10:
             position_input = []
             for index in row:
-                temp_data = next(itertools.islice(csv.reader(f), index, None))
+                try:
+                    temp_data = next(itertools.islice(csv.reader(f, delimiter="\t"), index, None))
+                except StopIteration:
+                    print("STOP ITERATION")
                 row_data = []
                 # Append the row data values
                 for i in temp_data[6]:
@@ -413,6 +425,7 @@ def load_multiple_reads_data(args):
                     continue
                 row_data_float = [float(i) for i in row_data]
                 position_input.append(row_data_float)
+                print("PASSED")
             # Position input has 10 rows corresponding to 10 reads for a particular position
             position_input = np.asarray(position_input)
             test_x.append(position_input)

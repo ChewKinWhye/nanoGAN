@@ -9,6 +9,7 @@ from utils.save import save_vae_model_dna
 latent_dim = 10
 
 args = parse_args()
+test_x, test_y = load_multiple_reads_data(args)
 x_train, y_train, x_test, y_test, x_val, y_val, min_values, max_values = load_dna_data_vae(args)
 
 # Train VAE
@@ -47,4 +48,4 @@ print(f"\tPrecision   : {precision_val:.3f}")
 print(f"\tAUC         : {au_roc_val:.3f}")
 print(f"{cm_val}")
 
-test_x, test_y = load_multiple_reads_data(args)
+#test_x, test_y = load_multiple_reads_data(args)
