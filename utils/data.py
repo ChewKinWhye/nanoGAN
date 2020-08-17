@@ -31,21 +31,33 @@ def D_data(n_samples, G, mode, x_train, latent_dim):
 def load_rna_data_vae(args):
     train_size = int(args.data_size * 0.8)
     test_size = int(args.data_size * 0.1)
-    file_path_normal = os.path.join(args.data_path, "epinano_rna_data.csv")
+    file_path_normal = os.path.join(args.data_path, "ecoli_MSssI_50mil_coverage10_readqual_extracted.tsv")
+    file_path_modified = os.path.join(args.data_path, "ecoli_pcr_50mil_coverage10_readqual_extracted.tsv")
     X = []
     Y = []
     with open(file_path_normal) as tsv_file:
-        read_tsv = csv.reader(tsv_file, delimiter=",")
+        read_tsv = csv.reader(tsv_file, delimiter="\t")
         for i, row in enumerate(read_tsv):
             if i == 0:
                 continue
-            Y.append(int(row[0]))
-            row_float = [float(x) for x in row[1:]]
-            X.append(row_float[1:])
+            Y.append(int(0))
+            row_float = [float(x) for x in row[3:]]
+            X.append(row_float)
+
+    with open(file_path_modified) as tsv_file:
+        read_tsv = csv.reader(tsv_file, delimiter="\t")
+        for i, row in enumerate(read_tsv):
+            if i == 0:
+                continue
+            Y.append(int(1))
+            row_float = [float(x) for x in row[3:]]
+            X.append(row_float)
+                                                                                            
     # Normalize between 0 and 1
     min_max_scalar = preprocessing.MinMaxScaler()
     X = min_max_scalar.fit_transform(np.asarray(X))
     Y = np.asarray(Y)
+    print(X.shape)
     X, Y = shuffle(X, Y, random_state=0)
     x_train = X[0:train_size, :]
     y_train = Y[0:train_size]
@@ -80,8 +92,8 @@ def load_dna_data_vae(args):
                 break
             row_data = []
             # Append the row data values
-            if row[6][6:11] != "ATCGA":
-                continue
+            #if row[6][6:11] != "ATCGA":
+            #    continue
             for i in row[6]:
                 row_data.extend(dna_lookup[i])
             row_data.extend(row[7].split(","))
@@ -112,8 +124,8 @@ def load_dna_data_vae(args):
             # 3000 test data points
             if data_count == total_size:
                 break
-            if row[6][6:11] != 'ATCGA':
-                continue
+            #if row[6][6:11] != 'ATCGA':
+            #    continue
             row_data = []
             for i in row[6]:
                 row_data.extend(dna_lookup[i])
@@ -139,6 +151,7 @@ def load_dna_data_vae(args):
     print(f"Number of outliers: {outlier_counter}")
 
     # Normalize data
+    '''
     non_modified_data.extend(modified_data)
     total = np.asarray(non_modified_data)
     feature_1 = total[:, 0:68]
@@ -160,7 +173,7 @@ def load_dna_data_vae(args):
 
     non_modified_data = total[0:total_size]
     modified_data = total[total_size:]
-
+    '''
     random.shuffle(non_modified_data)
     random.shuffle(modified_data)
 
@@ -190,7 +203,7 @@ def load_dna_data_vae(args):
     print(f"Validation data shape: {val_x.shape}")
     print(f"Validation data labels shape: {val_y.shape}")
 
-    return train_x, train_y, test_x, test_y, val_x, val_y, min_values, max_values
+    return train_x, train_y, test_x, test_y, val_x, val_y, 0, 0
 
 
 def load_dna_data_gan(args):
