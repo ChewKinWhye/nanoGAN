@@ -4,6 +4,7 @@ import os
 import random
 from sklearn import preprocessing
 from sklearn.utils import shuffle
+import itertools
 
 
 def noise_data(n_samples, latent_dim):
@@ -150,30 +151,6 @@ def load_dna_data_vae(args):
 
     print(f"Number of outliers: {outlier_counter}")
 
-    # Normalize data
-    '''
-    non_modified_data.extend(modified_data)
-    total = np.asarray(non_modified_data)
-    feature_1 = total[:, 0:68]
-    feature_2 = total[:, 68:85]
-    feature_3 = total[:, 85:102]
-    feature_4 = total[:, 102:119]
-    signals = total[:, 119:]
-    # Standardize features by block
-    total = [feature_1, feature_2, feature_3, feature_4, signals]
-    min_values = []
-    max_values = []
-    for i in range(len(total)):
-        temp_max = np.amax(total[i])
-        temp_min = np.amin(total[i])
-        max_values.append(temp_max)
-        min_values.append(temp_min)
-        total[i] = (total[i] - temp_min) / (temp_max - temp_min)
-    total = list(np.concatenate((total[0], total[1], total[2], total[3], total[4]), axis=1))
-
-    non_modified_data = total[0:total_size]
-    modified_data = total[total_size:]
-    '''
     random.shuffle(non_modified_data)
     random.shuffle(modified_data)
 
@@ -337,49 +314,108 @@ def load_dna_data_gan(args):
 
 
 def load_multiple_reads_data(args):
-    test_size = 1000
-
-    modification_ratio = 0.5
-    dna_lookup = {"A": [0, 0, 0, 1], "T": [0, 0, 1, 0], "G": [0, 1, 0, 0], "C": [1, 0, 0, 0]}
+    test_size = 10000
     # Global parameters
     file_path_normal = os.path.join(args.data_path, "pcr.tsv")
     file_path_modified = os.path.join(args.data_path, "msssi.tsv")
-    total_from_non_modified = 5000000
-    total_from_modified = 5000000
+    total_size = 5000000
     non_modified_duplicate = {}
     non_modified_duplicate_10 = []
+    dna_lookup = {"A": [0, 0, 0, 1], "T": [0, 0, 1, 0], "G": [0, 1, 0, 0], "C": [1, 0, 0, 0]}
+
     # Extract data from non-modified
     with open(file_path_normal) as tsv_file:
         read_tsv = csv.reader(tsv_file, delimiter="\t")
         data_count = 0
         for index, row in enumerate(read_tsv):
-            if row[3] in non_modified_duplicate:
-                non_modified_duplicate[row[3]][0] += 1
-            else:
-                non_modified_duplicate[row[3]] = [1]
+            if data_count == total_size:
+                break
             non_modified_duplicate[row[3]].append(index)
             data_count += 1
-
+    # Find the ones with more than 10 reads
     for x in non_modified_duplicate:
-        if non_modified_duplicate[x][0] >= 10:
+        if len(non_modified_duplicate[row[3]]) >= 10:
             non_modified_duplicate_10.append(non_modified_duplicate[x])
 
     modified_duplicate = {}
     modified_duplicate_10 = []
+    # Extract data from modified
     with open(file_path_modified) as tsv_file:
         read_tsv = csv.reader(tsv_file, delimiter="\t")
         data_count = 0
         for index, row in enumerate(read_tsv):
-            if data_count == total_from_modified:
+            if data_count == total_size:
                 break
-            if row[3] in modified_duplicate:
-                modified_duplicate[row[3]][0] += 1
-            else:
-                modified_duplicate[row[3]] = [1]
             modified_duplicate[row[3]].append(index)
             data_count += 1
-    for x in modified_duplicate:
-        if modified_duplicate[x][0] >= 10:
-            modified_duplicate_10.append(modified_duplicate[x])
 
-    return modified_duplicate_10, non_modified_duplicate_10, np.ones(10000), np.zeros(10000)
+    # Find the ones with more than 10 reads
+    for x in modified_duplicate:
+        if len(modified_duplicate[x]) >= 10:
+            modified_duplicate_10.append(modified_duplicate[x][0:10])
+    print(len(modified_duplicate_10))
+    print(len(non_modified_duplicate_10))
+    modified_duplicate_10 = modified_duplicate_10[0:test_size]
+    non_modified_duplicate_10 = non_modified_duplicate_10[0:test_size]
+    test_x = []
+    test_y = np.append(np.ones(test_size), np.zeros(test_size))
+    with open(file_path_modified, 'r') as f:
+        for row in modified_duplicate_10:
+            position_input = []
+            for index in row:
+                temp_data = next(itertools.islice(csv.reader(f), index, None))
+                row_data = []
+                # Append the row data values
+                for i in temp_data[6]:
+                    row_data.extend(dna_lookup[i])
+                row_data.extend(temp_data[7].split(","))
+                row_data.extend(temp_data[8].split(","))
+                row_data.extend(temp_data[9].split(","))
+                row_data.extend(temp_data[10].split(","))
+
+                signal_float = [float(i) for i in row[10].split(",")]
+                len_float = [float(i) for i in row[9].split(",")]
+                sd_float = [float(i) for i in row[8].split(",")]
+                # Check for data outliers
+                if max(signal_float) > 4 or min(signal_float) < -4 or max(len_float) > 150 or max(sd_float) > 1:
+                    continue
+                # Check for data errors
+                if row[5].lower() == 'c' or len(row_data) != 479 or row[-1] != "0":
+                    continue
+                row_data_float = [float(i) for i in row_data]
+                position_input.append(row_data_float)
+            # Position input has 10 rows corresponding to 10 reads for a particular position
+            position_input = np.asarray(position_input)
+            test_x.append(position_input)
+    print(len(test_x))
+    with open(file_path_normal, 'r') as f:
+        for row in non_modified_duplicate_10:
+            position_input = []
+            for index in row:
+                temp_data = next(itertools.islice(csv.reader(f), index, None))
+                row_data = []
+                # Append the row data values
+                for i in temp_data[6]:
+                    row_data.extend(dna_lookup[i])
+                row_data.extend(temp_data[7].split(","))
+                row_data.extend(temp_data[8].split(","))
+                row_data.extend(temp_data[9].split(","))
+                row_data.extend(temp_data[10].split(","))
+
+                signal_float = [float(i) for i in row[10].split(",")]
+                len_float = [float(i) for i in row[9].split(",")]
+                sd_float = [float(i) for i in row[8].split(",")]
+                # Check for data outliers
+                if max(signal_float) > 4 or min(signal_float) < -4 or max(len_float) > 150 or max(sd_float) > 1:
+                    continue
+                # Check for data errors
+                if row[5].lower() == 'c' or len(row_data) != 479 or row[-1] != "0":
+                    continue
+                row_data_float = [float(i) for i in row_data]
+                position_input.append(row_data_float)
+            # Position input has 10 rows corresponding to 10 reads for a particular position
+            position_input = np.asarray(position_input)
+            test_x.append(position_input)
+    print(len(test_x))
+    print(len(test_y))
+    return test_x, test_y

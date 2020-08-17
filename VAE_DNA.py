@@ -1,6 +1,6 @@
 from tensorflow import keras
 import numpy as np
-from utils.data import load_dna_data_vae
+from utils.data import load_dna_data_vae, load_multiple_reads_data
 from utils.arguments import parse_args
 from utils.evaluate import compute_metrics_standardized, plot_label_clusters
 from utils.vae_model import VAE_DNA
@@ -46,3 +46,5 @@ print(f"\tSpecificity : {specificity_val:.3f}")
 print(f"\tPrecision   : {precision_val:.3f}")
 print(f"\tAUC         : {au_roc_val:.3f}")
 print(f"{cm_val}")
+
+test_x, test_y = load_multiple_reads_data(args)
