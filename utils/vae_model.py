@@ -57,6 +57,7 @@ class VAE_DNA(keras.Model):
         predictor_output = layers.Dense(1, activation="sigmoid")(x)
         predictor = keras.Model(predictor_input, predictor_output, name="predictor")
         predictor.compile(loss=keras.losses.binary_crossentropy, optimizer=keras.optimizers.Adam())
+        predictor.summary()
         return predictor
 
     def train_step(self, data):
@@ -131,6 +132,7 @@ class VAE_RNA(keras.Model):
                                         bias_initializer='zeros')(x)
         predictor = keras.Model(predictor_input, predictor_output, name="predictor")
         predictor.compile(loss=keras.losses.binary_crossentropy, optimizer=keras.optimizers.Adam())
+        predictor.summary()
         return predictor
 
     def train_step(self, data):

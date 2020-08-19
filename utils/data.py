@@ -105,7 +105,6 @@ def load_dna_data_vae(args):
             signal_float = [float(i) for i in row[10].split(",")]
             len_float = [float(i) for i in row[9].split(",")]
             sd_float = [float(i) for i in row[8].split(",")]
-
             # Check for data outliers
             if max(signal_float) > 4 or min(signal_float) < -4 or max(len_float) > 150 or max(sd_float) > 1:
                 outlier_counter += 1
@@ -138,12 +137,11 @@ def load_dna_data_vae(args):
             signal_float = [float(i) for i in row[10].split(",")]
             len_float = [float(i) for i in row[9].split(",")]
             sd_float = [float(i) for i in row[8].split(",")]
-
             # Check for data outliers
             if max(signal_float) > 4 or min(signal_float) < -4 or max(len_float) > 150 or max(sd_float) > 1:
                 outlier_counter += 1
                 continue
-                # Check for data errors
+            # Check for data errors
             if row[5].lower() == 'c' or len(row_data) != 479 or row[-1] != "1":
                 continue
             modified_data.append(row_data_float)
@@ -314,11 +312,11 @@ def load_dna_data_gan(args):
 
 
 def load_multiple_reads_data(args):
-    test_size = 10000
+    test_size = 2500
     # Global parameters
     file_path_normal = os.path.join(args.data_path, "pcr.tsv")
     file_path_modified = os.path.join(args.data_path, "msssi.tsv")
-    total_size = 5000000
+    total_size = 2000000
     non_modified_duplicate = {}
     non_modified_duplicate_10 = []
     dna_lookup = {"A": [0, 0, 0, 1], "T": [0, 0, 1, 0], "G": [0, 1, 0, 0], "C": [1, 0, 0, 0]}
@@ -341,15 +339,16 @@ def load_multiple_reads_data(args):
             row_data.extend(row[9].split(","))
             row_data.extend(row[10].split(","))
             row_data_float = [float(i) for i in row_data]
+            '''
             signal_float = [float(i) for i in row[10].split(",")]
             len_float = [float(i) for i in row[9].split(",")]
             sd_float = [float(i) for i in row[8].split(",")]
-
             # Check for data outliers
             if max(signal_float) > 4 or min(signal_float) < -4 or max(len_float) > 150 or max(sd_float) > 1:
                 continue
-                # Check for data errors
-            if row[5].lower() == 'c' or len(row_data) != 479 or row[-1] != "1":
+            '''
+            # Check for data errors
+            if row[5].lower() == 'c' or len(row_data) != 479 or row[-1] != "0":
                 continue
             non_modified_duplicate[row[3]].append(row_data_float)
             data_count += 1
@@ -357,8 +356,8 @@ def load_multiple_reads_data(args):
     for x in non_modified_duplicate:
         if len(non_modified_duplicate[x]) >= 10:
             test_x.append(non_modified_duplicate[x][0:10])
+    non_modified_duplicate.clear()
     test_x = test_x[0:test_size]
-
     modified_duplicate = {}
     modified_duplicate_10 = []
     # Extract data from modified
@@ -379,14 +378,15 @@ def load_multiple_reads_data(args):
             row_data.extend(row[9].split(","))
             row_data.extend(row[10].split(","))
             row_data_float = [float(i) for i in row_data]
+            '''
             signal_float = [float(i) for i in row[10].split(",")]
             len_float = [float(i) for i in row[9].split(",")]
             sd_float = [float(i) for i in row[8].split(",")]
-
             # Check for data outliers
             if max(signal_float) > 4 or min(signal_float) < -4 or max(len_float) > 150 or max(sd_float) > 1:
                 continue
-                # Check for data errors
+            '''
+            # Check for data errors
             if row[5].lower() == 'c' or len(row_data) != 479 or row[-1] != "1":
                 continue
             modified_duplicate[row[3]].append(row_data_float)
@@ -397,11 +397,7 @@ def load_multiple_reads_data(args):
         if len(modified_duplicate[x]) >= 10:
             test_x.append(modified_duplicate[x][0:10])
     test_x = test_x[0:2 * test_size]
-    # 20000 test points
-    print(len(test_x))
-    # Each test point contains 10 data point
-    print(len(test_x[0]))
-    # Each data point contains 360++ values
-    print(len(test_x[0][0]))
-    test_y = np.append( np.zeros(test_size), np.ones(test_size))
+    test_x = np.asarray(test_x)
+    print(test_x.shape)
+    test_y = np.append(np.zeros(test_size), np.ones(test_size))
     return test_x, test_y
