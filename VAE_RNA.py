@@ -19,7 +19,7 @@ vae.fit(x_train, epochs=30, batch_size=128)
 # Visualize cluster
 encoder = vae.encoder
 predictor = vae.predictor
-plot_label_clusters(encoder, x_train, y_train)
+plot_label_clusters(args.output_filename, encoder, x_train, y_train)
 
 # Train predictor
 x_train_mean, x_train_sd, _ = encoder.predict(x_train[0:5000])

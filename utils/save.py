@@ -30,8 +30,8 @@ def save_results(args, results):
         json.dump(result_json, outfile, indent=4)
 
 
-def save_vae_model_dna(encoder, predictor, min_values, max_values):
-    result_path = f'./results/VAE_DNA_model'
+def save_vae_model_dna(args, encoder, predictor, min_values, max_values):
+    result_path = f'./results/{args.output_filename}'
     if not os.path.exists('./results'):
         os.makedirs('./results')
     if not os.path.exists(result_path):
@@ -47,7 +47,7 @@ def save_vae_model_dna(encoder, predictor, min_values, max_values):
 
 
 def save_vae_model_rna(args, encoder, predictor):
-    result_path = f'./results/VAE_RNA_model'
+    result_path = f'./results/{args.output_filename}'
     if not os.path.exists('./results'):
         os.makedirs('/.results')
     if not os.path.exists(result_path):

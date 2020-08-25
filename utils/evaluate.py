@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.metrics import auc, precision_recall_curve, confusion_matrix, roc_curve, f1_score, accuracy_score, recall_score, precision_score
 import random
-
+import os
 
 def compute_metrics_standardized(y_predicted, y_test):
     fpr, tpr, thresholds = roc_curve(y_test, y_predicted)
@@ -50,7 +50,7 @@ def compute_metrics_standardized_confident(y_predicted, y_test, confidence):
     return accuracy, sensitivity, specificity, precision, au_roc, cm
 
 
-def plot_label_clusters(encoder, data, labels):
+def plot_label_clusters(filename, encoder, data, labels):
     # display a 2D plot of the digit classes in the latent space
     filter_indices = random.sample(range(0, data.shape[0]-1), 3000)
     data_sample = np.take(data, filter_indices, axis=0)
@@ -62,3 +62,19 @@ def plot_label_clusters(encoder, data, labels):
     plt.xlabel("z[0]")
     plt.ylabel("z[1]")
     plt.show()
+    plt.savefig(os.path.join("results", filename, "Encoding_dimension"))
+
+def plot_label_clusters_10(filename, encoder, data, labels):
+    # display a 2D plot of the digit classes in the latent space
+    predictions = []
+    for row in data:
+        z_mean, _, _ = encoder.predict(row)
+        predictions.append(np.average(z_mean, axis=0))
+    predictions = np.asarray(predictions)
+    plt.figure(figsize=(12, 10))
+    plt.scatter(predictions[:, 0], predictions[:, 1], c=labels, s=0.5)
+    plt.colorbar()
+    plt.xlabel("z[0]")
+    plt.ylabel("z[1]")
+    plt.show()
+    plt.savefig(os.path.join("results", filename, "Encoding_dimension_10"))

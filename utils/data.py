@@ -41,6 +41,8 @@ def load_rna_data_vae(args):
         for i, row in enumerate(read_tsv):
             if i == 0:
                 continue
+            if i == int(args.data_size/2) + 1:
+                break
             Y.append(int(0))
             row_float = [float(x) for x in row[3:]]
             X.append(row_float)
@@ -50,10 +52,11 @@ def load_rna_data_vae(args):
         for i, row in enumerate(read_tsv):
             if i == 0:
                 continue
+            if i == int(args.data_size/2) + 1:
+                break
             Y.append(int(1))
             row_float = [float(x) for x in row[3:]]
             X.append(row_float)
-                                                                                            
     # Normalize between 0 and 1
     min_max_scalar = preprocessing.MinMaxScaler()
     X = min_max_scalar.fit_transform(np.asarray(X))
@@ -93,20 +96,20 @@ def load_dna_data_vae(args):
                 break
             row_data = []
             # Append the row data values
-            #if row[6][6:11] != "ATCGA":
-            #    continue
+            if row[6][6:11] != "ATCGA":
+                continue
             for i in row[6]:
                 row_data.extend(dna_lookup[i])
             row_data.extend(row[7].split(","))
             row_data.extend(row[8].split(","))
             row_data.extend(row[9].split(","))
-            row_data.extend(row[10].split(","))
+            row_data.extend([float(i)*10 for i in row[10].split(",")])
             row_data_float = [float(i) for i in row_data]
             signal_float = [float(i) for i in row[10].split(",")]
             len_float = [float(i) for i in row[9].split(",")]
             sd_float = [float(i) for i in row[8].split(",")]
             # Check for data outliers
-            if max(signal_float) > 4 or min(signal_float) < -4 or max(len_float) > 150 or max(sd_float) > 1:
+            if max(signal_float) > 8 or min(signal_float) < -8 or max(len_float) > 300 or max(sd_float) > 2:
                 outlier_counter += 1
                 continue
             # Check for data errors
@@ -124,21 +127,21 @@ def load_dna_data_vae(args):
             # 3000 test data points
             if data_count == total_size:
                 break
-            #if row[6][6:11] != 'ATCGA':
-            #    continue
+            if row[6][6:11] != 'ATCGA':
+                continue
             row_data = []
             for i in row[6]:
                 row_data.extend(dna_lookup[i])
             row_data.extend(row[7].split(","))
             row_data.extend(row[8].split(","))
             row_data.extend(row[9].split(","))
-            row_data.extend(row[10].split(","))
+            row_data.extend([float(i)*10 for i in row[10].split(",")])
             row_data_float = [float(i) for i in row_data]
             signal_float = [float(i) for i in row[10].split(",")]
             len_float = [float(i) for i in row[9].split(",")]
             sd_float = [float(i) for i in row[8].split(",")]
             # Check for data outliers
-            if max(signal_float) > 4 or min(signal_float) < -4 or max(len_float) > 150 or max(sd_float) > 1:
+            if max(signal_float) > 8 or min(signal_float) < -8 or max(len_float) > 300 or max(sd_float) > 2:
                 outlier_counter += 1
                 continue
             # Check for data errors
@@ -215,7 +218,7 @@ def load_dna_data_gan(args):
             row_data.extend(row[7].split(","))
             row_data.extend(row[8].split(","))
             row_data.extend(row[9].split(","))
-            row_data.extend(row[10].split(","))
+            row_data.extend([float(i)*5 for i in row[10].split(",")])
             row_data_float = [float(i) for i in row_data]
             signal_float = [float(i) for i in row[10].split(",")]
             len_float = [float(i) for i in row[9].split(",")]
@@ -247,7 +250,7 @@ def load_dna_data_gan(args):
             row_data.extend(row[7].split(","))
             row_data.extend(row[8].split(","))
             row_data.extend(row[9].split(","))
-            row_data.extend(row[10].split(","))
+            row_data.extend([float(i)*5 for i in row[10].split(",")])
             row_data_float = [float(i) for i in row_data]
             signal_float = [float(i) for i in row[10].split(",")]
             len_float = [float(i) for i in row[9].split(",")]
@@ -328,6 +331,8 @@ def load_multiple_reads_data(args):
         for index, row in enumerate(read_tsv):
             if data_count == total_size:
                 break
+            if row[6][6:11] != 'ATCGA':
+                continue
             if row[3] not in non_modified_duplicate:
                 non_modified_duplicate[row[3]] = []
             # Append data instead of index
@@ -337,16 +342,14 @@ def load_multiple_reads_data(args):
             row_data.extend(row[7].split(","))
             row_data.extend(row[8].split(","))
             row_data.extend(row[9].split(","))
-            row_data.extend(row[10].split(","))
+            row_data.extend([float(i)*10 for i in row[10].split(",")]) 
             row_data_float = [float(i) for i in row_data]
-            '''
             signal_float = [float(i) for i in row[10].split(",")]
             len_float = [float(i) for i in row[9].split(",")]
             sd_float = [float(i) for i in row[8].split(",")]
             # Check for data outliers
-            if max(signal_float) > 4 or min(signal_float) < -4 or max(len_float) > 150 or max(sd_float) > 1:
+            if max(signal_float) > 8 or min(signal_float) < -8 or max(len_float) > 300 or max(sd_float) > 2:
                 continue
-            '''
             # Check for data errors
             if row[5].lower() == 'c' or len(row_data) != 479 or row[-1] != "0":
                 continue
@@ -367,6 +370,8 @@ def load_multiple_reads_data(args):
         for index, row in enumerate(read_tsv):
             if data_count == total_size:
                 break
+            if row[6][6:11] != 'ATCGA':
+                continue
             if row[3] not in modified_duplicate:
                 modified_duplicate[row[3]] = []
             # Append data instead of index
@@ -376,16 +381,14 @@ def load_multiple_reads_data(args):
             row_data.extend(row[7].split(","))
             row_data.extend(row[8].split(","))
             row_data.extend(row[9].split(","))
-            row_data.extend(row[10].split(","))
+            row_data.extend([float(i)*10 for i in row[10].split(",")]) 
             row_data_float = [float(i) for i in row_data]
-            '''
             signal_float = [float(i) for i in row[10].split(",")]
             len_float = [float(i) for i in row[9].split(",")]
             sd_float = [float(i) for i in row[8].split(",")]
             # Check for data outliers
-            if max(signal_float) > 4 or min(signal_float) < -4 or max(len_float) > 150 or max(sd_float) > 1:
+            if max(signal_float) > 8 or min(signal_float) < -8 or max(len_float) > 300 or max(sd_float) > 2:
                 continue
-            '''
             # Check for data errors
             if row[5].lower() == 'c' or len(row_data) != 479 or row[-1] != "1":
                 continue

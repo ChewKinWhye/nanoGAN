@@ -2,11 +2,11 @@ from tensorflow import keras
 import numpy as np
 from utils.data import load_dna_data_vae, load_multiple_reads_data
 from utils.arguments import parse_args
-from utils.evaluate import compute_metrics_standardized, plot_label_clusters
+from utils.evaluate import compute_metrics_standardized, plot_label_clusters, plot_label_clusters_10
 from utils.vae_model import VAE_DNA
 from utils.save import save_vae_model_dna
 
-latent_dim = 10
+latent_dim = 20
 
 args = parse_args()
 x_train, y_train, x_test, y_test, x_val, y_val, min_values, max_values = load_dna_data_vae(args)
@@ -21,7 +21,7 @@ print(x_train[0:5, 24:44])
 print(vae.decoder.predict(vae.encoder.predict(x_train[0:5, :]))[:, 24:44])
 predictor = vae.predictor
 encoder = vae.encoder
-plot_label_clusters(encoder, x_train, y_train)
+plot_label_clusters(args.output_filename, encoder, x_train, y_train)
 
 # Train predictor
 predictor_size = int(len(x_train)/10)
@@ -37,7 +37,7 @@ accuracy_val, sensitivity_val, specificity_val, precision_val, au_roc_val, cm_va
     pred_out, y_test)
 
 # Save model
-save_vae_model_dna(encoder, predictor, min_values, max_values)
+#save_vae_model_dna(encoder, predictor, min_values, max_values)
 
 # Print results
 print(f"\tAccuracy    : {accuracy_val:.3f}")
@@ -48,6 +48,8 @@ print(f"\tAUC         : {au_roc_val:.3f}")
 print(f"{cm_val}")
 
 test_x_10, test_y_10 = load_multiple_reads_data(args)
+plot_label_clusters_10(args.output_filename, encoder, test_x_10, test_y_10)
+
 predictions = []
 for x in test_x_10:
     test_x_mean, test_x_sd, _ = encoder.predict(x)
